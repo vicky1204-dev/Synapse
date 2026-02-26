@@ -11,7 +11,7 @@ const userSignup = asyncHandler(async (req, res) => {
   let user = await User.findOne({ $or: [{ username }, { email }] });
   if (user) {
     logger.warn("User already exists");
-    res.status(400).json(new ApiResponse(400, {}, "User already exists"));
+    return res.status(400).json(new ApiResponse(400, {}, "User already exists"));
   }
 
   user = await User.create({
@@ -35,10 +35,45 @@ const userSignup = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         201,
-        { accessToken, refreshToken },
+        { user: {id: user._id, email, username} ,accessToken, refreshToken },
         "User registered successfully",
       ),
     );
 });
 
-export { userSignup };
+const userLogin = asyncHandler(async (req, res)=>{
+    logger.info("Login endpoint hit")
+    const {email, password} = req.body;
+    const existingUser = await User.findOne({email})
+    if(!user){
+        logger.warn("User not found")
+        return res.status(404).json(new ApiResponse(404, {}, "User not found"))
+    }
+
+    const isPassValid = user.checkPassword(password)
+    if(!isPassValid) {
+        logger.warn("Invalid password")
+        return res.status(400).json(new ApiResponse(400, {}, "Invalid Password"))
+    }
+
+    const { accessToken, refreshToken } = await generateTokens(user);
+
+    const user = {
+        id: existingUser._id,
+        username: existingUser.username,
+        email: existingUser.email
+    }
+
+    const options = {
+    httpOnly: true,
+    secure: true,
+  }
+
+    res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(new ApiResponse(200, {user, accessToken, refreshToken}, "User Logged in successfully"))
+})
+
+export { userSignup, userLogin };
