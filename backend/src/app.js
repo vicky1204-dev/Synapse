@@ -1,7 +1,7 @@
 import express, { urlencoded } from "express"
 import cors from "cors"
 import helmet from "helmet"
-import { errorHandler } from "./middlewares/error.middleware"
+import { errorHandler } from "./middlewares/error.middleware.js"
 import cookieParser from "cookie-parser";
 
 const app = express()
