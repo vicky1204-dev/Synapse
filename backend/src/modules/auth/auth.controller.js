@@ -45,12 +45,12 @@ const userLogin = asyncHandler(async (req, res)=>{
     logger.info("Login endpoint hit")
     const {email, password} = req.body;
     const existingUser = await User.findOne({email})
-    if(!user){
+    if(!existingUser){
         logger.warn("User not found")
         return res.status(404).json(new ApiResponse(404, {}, "User not found"))
     }
 
-    const isPassValid = user.checkPassword(password)
+    const isPassValid = await user.checkPassword(password)
     if(!isPassValid) {
         logger.warn("Invalid password")
         return res.status(400).json(new ApiResponse(400, {}, "Invalid Password"))
@@ -66,7 +66,7 @@ const userLogin = asyncHandler(async (req, res)=>{
 
     const options = {
     httpOnly: true,
-    secure: true,
+    secure: true, // dont use in localhost it will break
   }
 
     res
