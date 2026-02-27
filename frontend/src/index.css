@@ -5,4 +5,9 @@
     --color-bg-secondary: #171717;
     --color-text-primary: #f2f2f2;
     --color-text-secondary: #a1a1a1;
+    --font-clash: "Clash Grotesk", sans-serif;
+}
+
+body {
+    font-family: "Satoshi", sans-serif;
 }
