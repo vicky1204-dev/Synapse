@@ -2,8 +2,8 @@ import { ApiResponse } from "../../utils/apiResponse.util.js";
 import { asyncHandler } from "../../utils/asyncHandler.util.js";
 import { logger } from "../../utils/logger.util.js";
 
-const getMe = asyncHandler(async (req, res) => {
-  logger.info("Get me endpoint hit");
+const getCurrentUser = asyncHandler(async (req, res) => {
+  logger.info("Get current user endpoint hit");
   const user = {
     id: req.user._id,
     email: req.user.email,
@@ -13,5 +13,5 @@ const getMe = asyncHandler(async (req, res) => {
 });
 
 export {
-    getMe
+    getCurrentUser
 }
