@@ -8,12 +8,21 @@ import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import Admin from "./pages/AdminPage";
 import AuthLayout from "./components/AuthLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
   return (
     <>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
 
         <Route element={<AuthLayout />}>
           <Route path="/register" element={<SignupPage />} />
@@ -21,7 +30,6 @@ const App = () => {
         </Route>
 
         <Route element={<SideBarLayout />}>
-          <Route path="/admin" element={<Admin />} />
           <Route path="/questions" element={<QuestionsPage />} />
           <Route path="/notes" element={<NotesPage />} />
         </Route>
