@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useMainContext } from "../context/MainContext";
 
 const sideBarData = [
   {
@@ -77,10 +78,11 @@ const sideBarData = [
 ];
 
 const SideBar = () => {
+  const { setSidebarVisible } = useMainContext();
   return (
     <>
       <motion.div
-        initial={{ y: 20, opcaity: 0 }}
+        initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1, transition: { duration: 0.3 } }}
         className="h-full flex flex-col justify-between py-8 px-4 border border-white/20 rounded-lg bg-black"
       >
@@ -110,9 +112,13 @@ const SideBar = () => {
               <div className={`flex flex-col gap-0 `}>
                 {data.links.map((item, index) => {
                   const IconComponent = item.icon;
-
                   return (
-                    <NavLink to={item.to} key={item.to} className={`relative`}>
+                    <NavLink
+                      to={item.to}
+                      key={item.to}
+                      className={`relative`}
+                      onClick={() => setSidebarVisible(false)}
+                    >
                       {({ isActive }) => {
                         return (
                           <motion.div
