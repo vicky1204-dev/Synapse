@@ -1,5 +1,5 @@
 import React from "react";
-import SideBarLayout from "./components/SideBarLayout";
+import MainLayout from "./components/MainLayout";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import QuestionsPage from "./pages/QuestionsPage";
@@ -9,6 +9,10 @@ import LoginPage from "./pages/LoginPage";
 import Admin from "./pages/AdminPage";
 import AuthLayout from "./components/AuthLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DiscussionsPage from "./pages/DiscussionsPage";
+import MyQuestionsPage from "./pages/MyQuestionsPage";
+import MyNotesPage from "./pages/MyNotesPage";
+import ChatsPage from "./pages/ChatsPage";
 
 const App = () => {
   return (
@@ -29,9 +33,13 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
         </Route>
 
-        <Route element={<SideBarLayout />}>
-          <Route path="/questions" element={<QuestionsPage />} />
-          <Route path="/notes" element={<NotesPage />} />
+        <Route element={<MainLayout />}>
+          <Route path="/study/questions" element={<QuestionsPage />} />
+          <Route path="/study/notes" element={<NotesPage />} />
+          <Route path="/study/discussions" element={<DiscussionsPage />} />
+          <Route path="/personal/my-questions" element={<MyQuestionsPage />} />
+          <Route path="/personal/my-notes" element={<MyNotesPage />} />
+          <Route path="/personal/chats" element={<ChatsPage />} />
         </Route>
       </Routes>
     </>

@@ -1,9 +1,11 @@
-import React from 'react'
+import PageHeader from "../components/PageHeader";
 
 const QuestionsPage = () => {
   return (
-    <div>QuestionsPage</div>
-  )
-}
+    <div className=" w-full min-h-screen p-8 bg-black">
+      <PageHeader title={"Questions"} />
+    </div>
+  );
+};
 
-export default QuestionsPage
+export default QuestionsPage;
