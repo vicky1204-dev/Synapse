@@ -36,6 +36,13 @@ const getAllQuestions = asyncHandler(async (req, res) => {
 
 const getQuestion = asyncHandler(async (req, res) => {
   logger.info("Get question endpoint hit");
+  const questionId = req.params?.id
+  const question = await Question.findById(questionId)
+  if(!question){
+    logger.warn("Question not found")
+    return res.status(404).json(404, {}, "Question not found")
+  }
+  res.status(200).json(new ApiResponse(200, question, "Question fetched successfully"))
 });
 
 const getUserQuestions = asyncHandler(async (req, res) => {
