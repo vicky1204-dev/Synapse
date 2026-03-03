@@ -151,4 +151,28 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     .cookie("refreshToken", newRefreshToken, options);
 });
 
-export { userSignup, userLogin, refreshAccessToken };
+const logout = asyncHandler(async (req, res) => {
+  logger.info("Logout endpoint hit!");
+  const { refreshToken } = req.cookies?.refreshToken;
+  if (!refreshToken) {
+    logger.warn("Missing refresh token");
+    return res
+      .status(400)
+      .json(new ApiResponse(401, {}, "Refresh token missing"));
+  }
+  await RefreshToken.findOneAndDelete({ token: refreshToken });
+  logger.info("RefreshToken deleted and user has been logged out");
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "Logout Successful"));
+});
+
+export { userSignup, userLogin, refreshAccessToken, logout };
