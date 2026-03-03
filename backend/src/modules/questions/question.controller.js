@@ -1,4 +1,4 @@
-import { asyncHandler } from "../../utils/asyncHandler.util";
+import { asyncHandler } from "../../utils/asyncHandler.util.js";
 import { ApiResponse } from "../../utils/apiResponse.util.js";
 import { logger } from "../../utils/logger.util.js";
 import Question from "./Question.model.js";
@@ -18,6 +18,20 @@ const addQuestion = asyncHandler(async (req, res) => {
 
 const getAllQuestions = asyncHandler(async (req, res) => {
   logger.info("Get all questions endpoint hit");
+  const page = parseInt(req.query?.page) || 1
+  const limit = parseInt(req.query?.limit) || 10
+  const startIndex = (page - 1) * limit
+
+  const questions = await Question.find({}).sort({createdAt: -1}).skip(startIndex).limit(limit)
+  const totalQuestions = await Question.countDocuments()
+
+  const result = {
+    questions,
+    totalPages: totalQuestions/limit,
+    currentPageNumber: page
+  }
+
+  res.status(200).json(new ApiResponse(200, result, "Questions fetched successfully"))
 });
 
 const getQuestion = asyncHandler(async (req, res) => {
