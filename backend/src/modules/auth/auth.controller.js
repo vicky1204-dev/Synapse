@@ -111,4 +111,44 @@ const userLogin = asyncHandler(async (req, res) => {
     );
 });
 
-export { userSignup, userLogin };
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  logger.info("Refresh access token endpoint hit!");
+  const { refreshToken } = req.cookies?.refreshToken;
+  if (!refreshToken) {
+    logger.warn("Missing refresh token");
+    return res
+      .status(401)
+      .json(new ApiResponse(401, {}, "Refresh token missing"));
+  }
+  const storedToken = await RefreshToken.findOne({ token: refreshToken });
+  if (!storedToken || storedToken.expiresAt < new Date()) {
+    logger.warn("Token expired or invalid");
+    return res
+      .status(401)
+      .json(new ApiResponse(401, {}, "Refresh token Expired or invalid"));
+  }
+  const user = await User.findById(storedToken.user);
+  if (!user) {
+    logger.warn("No user found with the token");
+    return res
+      .status(401)
+      .json(new ApiResponse(401, {}, "Refresh token Expired or invalid"));
+  }
+
+  const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+    await generateTokens(user);
+
+  await RefreshToken.deleteOne({ _id: storedToken._id });
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  res
+    .status(200)
+    .cookie("accessToken", newAccessToken, options)
+    .cookie("refreshToken", newRefreshToken, options);
+});
+
+export { userSignup, userLogin, refreshAccessToken };
