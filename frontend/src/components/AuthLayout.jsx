@@ -1,16 +1,17 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { useLocation, useNavigate, useOutlet } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 const AuthLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isRegister = location.pathname === "/register";
   const isLogin = location.pathname === "/login";
+  const outlet = useOutlet();
   return (
-    <div className="flex items-center justify-center h-screen w-full">
-      <div className="h-full pt-16 w-300px">
+    <div className="flex items-center justify-center w-full">
+      <div className="h-fit pt-16  flex flex-col w-100">
         <motion.div
-          layout
+          layout="position"
           transition={{ duration: 0.2 }}
           className="flex gap-2 text-base text-text-secondary bg-bg-secondary border border-white/15 py-2 px-2 w-fit rounded-lg mb-4"
         >
@@ -41,7 +42,17 @@ const AuthLayout = () => {
             <span className="relative z-99">Login</span>
           </div>
         </motion.div>
-          <Outlet />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.25 }}
+          >
+            {outlet}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

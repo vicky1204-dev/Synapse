@@ -10,6 +10,9 @@ import {
 import { Link, NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useMainContext } from "../context/MainContext";
+import { useAuth } from "../auth/useAuth";
+import { useEffect } from "react";
+
 
 const sideBarData = [
   {
@@ -79,6 +82,10 @@ const sideBarData = [
 
 const SideBar = () => {
   const { setSidebarVisible } = useMainContext();
+  const { user } = useAuth();
+  useEffect(() => {
+    console.log("Sidebar sees user:", user);
+  }, [user]);
   return (
     <>
       <motion.div
@@ -115,7 +122,7 @@ const SideBar = () => {
                   return (
                     <NavLink
                       to={item.to}
-                      key={item.to}
+                      key={`${item.to}-${index}`}
                       className={`relative`}
                       onClick={() => setSidebarVisible(false)}
                     >
@@ -155,9 +162,9 @@ const SideBar = () => {
 
                             <div className="flex flex-col items-start justify-center z-10">
                               <h1
-                                className={
+                                className={`text-sm ${
                                   isActive ? "text-black" : "text-white"
-                                }
+                                }`}
                               >
                                 {item.title}
                               </h1>
@@ -176,9 +183,36 @@ const SideBar = () => {
             </div>
           );
         })}
-        <div className="flex items-center justify-center flex-col">
-          <button>Logout</button>
-          <Link>Profile</Link>
+        <div className="flex items-center justify-center flex-col gap-3">
+          {user && user.avatar ? (
+            <>
+              <Link
+                to={"/users/user/profile"}
+                className="flex items-center justify-center gap-2 text-sm"
+              >
+                <div className="bg-white  w-8 h-8  rounded-full flex items-center justify-center">
+                  <img
+                    src={user.avatar}
+                    className="object-cover  w-8 h-8  rounded-full opacity-40"
+                  />
+                </div>
+                Profile
+              </Link>
+            </>
+          ) : (
+            <Link
+              to={"/login"}
+              className="flex gap-2 items-center justify-center"
+            >
+              <div className="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center p-1">
+                <img
+                  src={"/assets/user-round.svg"}
+                  className="object-cover w-8 h-8 rounded-full opacity-40"
+                />
+              </div>
+              <span>Login</span>
+            </Link>
+          )}
         </div>
       </motion.div>
     </>

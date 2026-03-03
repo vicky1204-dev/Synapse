@@ -21,18 +21,14 @@ const LoginPage = () => {
       const res = await login(form);
       setUser(res.data.data.user);
       toast.success("Login Successful!");
-      navigate("/questions");
+      console.log("Login response: ", res.data.data.user)
+      navigate("/study/questions");
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
     }
   };
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -10 }}
-        transition={{ duration: 0.25 }}
+      <div
         className="text-text-primary flex flex-col gap-8 border border-white/20 rounded-lg py-6 px-8 min-w-md"
       >
         <div>
@@ -56,7 +52,7 @@ const LoginPage = () => {
               <Mail size={18} /> Email
             </span>
             <input
-              className="text-text-secondary focus:outline-none focus:border-white border-b border-white/15 rounded-lg py-1 px-2 w-full"
+              className="text-text-secondary focus:outline-none focus:border-white/30 border-b border-white/15 py-1 px-2 w-full"
               placeholder="Enter your email"
               type="email"
               onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -69,7 +65,7 @@ const LoginPage = () => {
               <Lock size={18} /> Password
             </span>
             <input
-              className="text-text-secondary focus:outline-none focus:border-white border-b border-white/15 rounded-lg py-1 px-2 w-full"
+              className="text-text-secondary focus:outline-none focus:border-white/30 border-b border-white/15 py-1 px-2 w-full"
               placeholder="Enter your password"
               type="password"
               value={form.password}
@@ -78,13 +74,12 @@ const LoginPage = () => {
           </div>
           <button
             type="submit"
-            className="bg-white text-black rounded-full cursor-pointer"
+            className="bg-white text-black rounded-full cursor-pointer px-6 py-2"
           >
             Submit
           </button>
         </form>
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 };
 

@@ -63,12 +63,7 @@ const SignupPage = () => {
   });
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -10 }}
-        transition={{ duration: 0.25 }}
+      <div
         className="text-text-primary flex flex-col gap-8 border border-white/20 rounded-lg py-6 px-8 w-lg"
       >
         <div>
@@ -83,8 +78,7 @@ const SignupPage = () => {
           form={form}
           setForm={setForm}
         />
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 };
 
