@@ -45,11 +45,6 @@ const getQuestion = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, question, "Question fetched successfully"))
 });
 
-const getUserQuestions = asyncHandler(async (req, res) => {
-  logger.info("Get user questions endpoint hit");
-
-});
-
 const deleteQuestion = asyncHandler(async (req, res) => {
   logger.info("Delete question endpoint hit");
   const questionId = req.params?.id

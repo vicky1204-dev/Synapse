@@ -34,10 +34,13 @@ app.use((req, res, next) => {
 //importing routes
 import authRouter from "./modules/auth/auth.route.js";
 import userRouter from "./modules/users/user.route.js"
+import questionRouter from "./modules/questions/question.routes.js"
 
 app.use("/api/auth", authRouter);
 
 app.use("/api/users", userRouter)
+
+app.use("/api/questions", questionRouter)
 
 app.use(errorHandler);
 
