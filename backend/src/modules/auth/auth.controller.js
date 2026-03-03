@@ -148,7 +148,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   res
     .status(200)
     .cookie("accessToken", newAccessToken, options)
-    .cookie("refreshToken", newRefreshToken, options);
+    .cookie("refreshToken", newRefreshToken, options)
+    .json(new ApiResponse(200, {}, "Tokens refreshed"));
 });
 
 const logout = asyncHandler(async (req, res) => {

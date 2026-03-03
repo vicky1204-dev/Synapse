@@ -11,8 +11,8 @@ import { Link, NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useMainContext } from "../context/MainContext";
 import { useAuth } from "../auth/useAuth";
-import { useEffect } from "react";
-
+import { logout } from "../auth/auth.service";
+import eventEmitter from "../utils/eventEmitter";
 
 const sideBarData = [
   {
@@ -83,9 +83,6 @@ const sideBarData = [
 const SideBar = () => {
   const { setSidebarVisible } = useMainContext();
   const { user } = useAuth();
-  useEffect(() => {
-    console.log("Sidebar sees user:", user);
-  }, [user]);
   return (
     <>
       <motion.div
@@ -198,6 +195,16 @@ const SideBar = () => {
                 </div>
                 Profile
               </Link>
+              <button
+                onClick={async () => {
+                  await logout();
+                  eventEmitter.emit("logout", { reason: "manual_logout" });
+                }}
+                className="text-text-secondary text-sm hover:text-black/80 duration-300 cursor-pointer py-1 px-3 border border-white/20 hover:bg-white rounded-lg ease-in-out"
+              >
+                Logout
+                <span className="w-full h-px bg-white"></span>
+              </button>
             </>
           ) : (
             <Link

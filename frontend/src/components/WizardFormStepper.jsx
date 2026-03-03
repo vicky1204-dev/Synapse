@@ -5,6 +5,8 @@ import { useAuth } from "../auth/useAuth";
 import { signup } from "../auth/auth.service.js";
 import { toast } from "react-toastify";
 import {useNavigate} from "react-router-dom"
+import SuccessToast from "./toasts/SuccessToast.jsx";
+import ErrorToast from "./toasts/ErrorToast.jsx";
 
 const WizardFormStepper = ({ stepsConfig = [], form, setForm }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -62,10 +64,10 @@ const WizardFormStepper = ({ stepsConfig = [], form, setForm }) => {
       setLoading(true);
       const res = await signup(form);
       setUser(res.data.data.user)
-      toast.success("Registration Successful!");
+      toast(<SuccessToast message={"Registration Successful"} title="Welcome"/>);
       navigate("/study/questions")
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something went wrong");
+      toast(<ErrorToast message={error?.response?.data?.message || "Something went wrong"}/>)
     } finally {
       setLoading(false);
     }

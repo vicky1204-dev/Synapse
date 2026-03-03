@@ -5,7 +5,9 @@ import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
 import synapse_logo from "../assets/synapse_logo.svg";
 import { Mail, Lock } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import SuccessToast from "../components/toasts/SuccessToast.jsx";
+import ErrorToast from "../components/toasts/ErrorToast.jsx";
 
 const LoginPage = () => {
   const { setUser } = useAuth();
@@ -20,11 +22,11 @@ const LoginPage = () => {
     try {
       const res = await login(form);
       setUser(res.data.data.user);
-      toast.success("Login Successful!");
+      toast(<SuccessToast message={"Login successful"} title="Welcome Back!"/>)
       console.log("Login response: ", res.data.data.user)
       navigate("/study/questions");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed");
+      toast(<ErrorToast message={error.response?.data?.message || "Login failed"}/>)
     }
   };
   return (
@@ -78,6 +80,7 @@ const LoginPage = () => {
           >
             Submit
           </button>
+          <Link to="/study/questions" className="text-center underline underline-offset-4 text-text-secondary hover:text-white text-sm">Skip login</Link>
         </form>
       </div>
   );

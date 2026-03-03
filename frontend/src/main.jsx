@@ -13,8 +13,18 @@ createRoot(document.getElementById("root")).render(
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        theme="dark"
-        toastClassName="bg-slate-800 text-white rounded-lg"
+        hideProgressBar
+        toastStyle={{
+          background: "black",
+          padding: 0,
+          boxShadow: "none",
+          width: "fit-content",
+          top: "96px"
+        }}
+        bodyStyle={{
+          padding: 0,
+          margin: 0,
+        }}
       />
     </AuthProvider>
   </BrowserRouter>,
