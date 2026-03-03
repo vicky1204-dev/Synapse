@@ -113,7 +113,7 @@ const userLogin = asyncHandler(async (req, res) => {
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
   logger.info("Refresh access token endpoint hit!");
-  const { refreshToken } = req.cookies?.refreshToken;
+  const { refreshToken } = req.cookies;
   if (!refreshToken) {
     logger.warn("Missing refresh token");
     return res
@@ -153,7 +153,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const logout = asyncHandler(async (req, res) => {
   logger.info("Logout endpoint hit!");
-  const { refreshToken } = req.cookies?.refreshToken;
+  const { refreshToken } = req.cookies;
   if (!refreshToken) {
     logger.warn("Missing refresh token");
     return res
