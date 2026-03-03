@@ -8,10 +8,11 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     id: req.user._id,
     email: req.user.email,
     username: req.user.username,
+    avatar: req.user.avatar,
   };
-  res.status(200).json(new ApiResponse(200, user, "Successfully returned the user"));
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "Successfully returned the user"));
 });
 
-export {
-    getCurrentUser
-}
+export { getCurrentUser };

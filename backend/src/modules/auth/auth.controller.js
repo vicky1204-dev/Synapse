@@ -17,7 +17,7 @@ const userSignup = asyncHandler(async (req, res) => {
       .json(new ApiResponse(400, {}, error.details[0].message));
   }
 
-  const { username, email, password } = req.body;
+  const { username, email, password, avatar, department, skills } = req.body;
   let user = await User.findOne({ $or: [{ username }, { email }] });
   if (user) {
     logger.warn("User already exists");
@@ -30,6 +30,9 @@ const userSignup = asyncHandler(async (req, res) => {
     username,
     email,
     password,
+    avatar,
+    department,
+    skills,
   });
 
   logger.info("User created successfully");
@@ -47,7 +50,11 @@ const userSignup = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         201,
-        { user: { id: user._id, email, username }, accessToken, refreshToken },
+        {
+          user: { id: user._id, email, username, avatar },
+          accessToken,
+          refreshToken,
+        },
         "User registered successfully",
       ),
     );
@@ -83,6 +90,7 @@ const userLogin = asyncHandler(async (req, res) => {
     id: existingUser._id,
     username: existingUser.username,
     email: existingUser.email,
+    avatar: existingUser.avatar,
   };
 
   const options = {
