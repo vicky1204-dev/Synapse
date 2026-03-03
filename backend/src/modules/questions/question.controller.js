@@ -47,10 +47,18 @@ const getQuestion = asyncHandler(async (req, res) => {
 
 const getUserQuestions = asyncHandler(async (req, res) => {
   logger.info("Get user questions endpoint hit");
+
 });
 
 const deleteQuestion = asyncHandler(async (req, res) => {
   logger.info("Delete question endpoint hit");
+  const questionId = req.params?.id
+  const question = await Question.find({_id: questionId, author: req.user._id})
+  if(!question) {
+    return res.status(404).json(new ApiResponse(404, {}, "Error deleting question"))
+  }
+  await Question.findByIdAndDelete(question._id)
+  res.status(200).json(new ApiResponse(200, question, "Question deleted successfully"))
 });
 
 export {
