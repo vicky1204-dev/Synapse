@@ -21,7 +21,7 @@ const PageHeader = ({ title, notifications = [] }) => {
   }, [scrollY]);
 
   return (
-    <header className="sticky top-4">
+    <header className="sticky top-0 pt-6 bg-black">
       <div className="flex justify-between items-center">
         <motion.h1
           initial={{ opacity: 0, filter: "blur(12px)", fontSize: 60 }}

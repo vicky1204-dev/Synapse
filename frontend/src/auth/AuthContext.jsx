@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
 
       if (payload?.reason === "session_expired") {
-        toast(<ErrorToast message={"Session expired. Please login again."}/>);
+        toast(<ErrorToast message={"Session expired. Please login."}/>);
       } else {
         toast(<SuccessToast message={"Logged out successfully."} title="Logout"/>);
       }

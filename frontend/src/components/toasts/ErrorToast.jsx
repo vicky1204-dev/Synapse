@@ -13,7 +13,7 @@ const ErrorToast = ({ message, closeToast, title = "" }) => {
             <X  size={18}/>
           </span>
         </h1>
-        <p className="text-xs text-text-secondary">{message}</p>
+        <p className="text-xs text-text-secondary pr-2">{message}</p>
       </div>
     </div>
   );
