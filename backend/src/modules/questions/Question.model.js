@@ -20,7 +20,10 @@ const questionSchema = new Schema(
       required: true,
     },
 
-    isClosed: Boolean,
+    isClosed: {
+      type: Boolean,
+      default: false
+    },
 
     closedReason: {
       type: String,
@@ -41,8 +44,14 @@ const questionSchema = new Schema(
       type: Number,
     },
 
-    upvotes: Number,
-    downvotes: Number,
+    upvotes: {
+      type: Number,
+      default: 0
+    },
+    downvotes: {
+      type: Number,
+      default: 0
+    },
 
     moderationStatus: {
       type: String,

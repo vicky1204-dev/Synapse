@@ -22,7 +22,7 @@ const getAllQuestions = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query?.limit) || 10
   const startIndex = (page - 1) * limit
 
-  const questions = await Question.find({}).sort({createdAt: -1}).skip(startIndex).limit(limit)
+  const questions = await Question.find({}).populate("author", "username avatar").sort({createdAt: -1}).skip(startIndex).limit(limit)
   const totalQuestions = await Question.countDocuments()
 
   const result = {
@@ -37,7 +37,7 @@ const getAllQuestions = asyncHandler(async (req, res) => {
 const getQuestion = asyncHandler(async (req, res) => {
   logger.info("Get question endpoint hit");
   const questionId = req.params?.id
-  const question = await Question.findById(questionId)
+  const question = await Question.findById(questionId).populate("author", "username avatar")
   if(!question){
     logger.warn("Question not found")
     return res.status(404).json(404, {}, "Question not found")
@@ -61,5 +61,4 @@ export {
   getAllQuestions,
   getQuestion,
   deleteQuestion,
-  getUserQuestions,
 };

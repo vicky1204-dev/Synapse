@@ -5,7 +5,6 @@ import {
   deleteQuestion,
   getAllQuestions,
   getQuestion,
-  getUserQuestions
 } from "./question.controller.js";
 
 const router = Router();
