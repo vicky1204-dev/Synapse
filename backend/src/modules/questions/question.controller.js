@@ -2,9 +2,19 @@ import { asyncHandler } from "../../utils/asyncHandler.util.js";
 import { ApiResponse } from "../../utils/apiResponse.util.js";
 import { logger } from "../../utils/logger.util.js";
 import Question from "./Question.model.js";
+import { validateAddQuestion } from "./question.validator.js";
 
 const addQuestion = asyncHandler(async (req, res) => {
   logger.info("Add question endpoint hit");
+
+  const { error } = validateAddQuestion(req.body);
+  if (error) {
+    logger.warn(`Validation error: ${error.details[0].message}`);
+    return res
+      .status(400)
+      .json(new ApiResponse(400, {}, error.details[0].message));
+  }
+
   const { title, body = "", tags = [] } = req.body;
   const newQuestion = await Question.create({
     title,
@@ -13,52 +23,67 @@ const addQuestion = asyncHandler(async (req, res) => {
     author: req.user._id,
   });
 
-  res.status(200).json(new ApiResponse(200, {}, "Question added successfully!"))
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Question added successfully!"));
 });
 
 const getAllQuestions = asyncHandler(async (req, res) => {
   logger.info("Get all questions endpoint hit");
-  const page = parseInt(req.query?.page) || 1
-  const limit = parseInt(req.query?.limit) || 10
-  const startIndex = (page - 1) * limit
+  const page = parseInt(req.query?.page) || 1;
+  const limit = parseInt(req.query?.limit) || 10;
+  const startIndex = (page - 1) * limit;
 
-  const questions = await Question.find({}).populate("author", "username avatar").sort({createdAt: -1}).skip(startIndex).limit(limit)
-  const totalQuestions = await Question.countDocuments()
+  const questions = await Question.find({})
+    .populate("author", "username avatar")
+    .sort({ createdAt: -1 })
+    .skip(startIndex)
+    .limit(limit);
+  const totalQuestions = await Question.countDocuments();
 
   const result = {
     questions,
-    totalPages: totalQuestions/limit,
-    currentPageNumber: page
-  }
+    totalPages: totalQuestions / limit,
+    currentPageNumber: page,
+  };
 
-  res.status(200).json(new ApiResponse(200, result, "Questions fetched successfully"))
+  res
+    .status(200)
+    .json(new ApiResponse(200, result, "Questions fetched successfully"));
 });
 
 const getQuestion = asyncHandler(async (req, res) => {
   logger.info("Get question endpoint hit");
-  const questionId = req.params?.id
-  const question = await Question.findById(questionId).populate("author", "username avatar")
-  if(!question){
-    logger.warn("Question not found")
-    return res.status(404).json(404, {}, "Question not found")
+  const questionId = req.params?.id;
+  const question = await Question.findById(questionId).populate(
+    "author",
+    "username avatar",
+  );
+  if (!question) {
+    logger.warn("Question not found");
+    return res.status(404).json(404, {}, "Question not found");
   }
-  res.status(200).json(new ApiResponse(200, question, "Question fetched successfully"))
+  res
+    .status(200)
+    .json(new ApiResponse(200, question, "Question fetched successfully"));
 });
 
 const deleteQuestion = asyncHandler(async (req, res) => {
   logger.info("Delete question endpoint hit");
-  const questionId = req.params?.id
-  const question = await Question.find({_id: questionId, author: req.user._id})
-  if(!question) {
-    return res.status(404).json(new ApiResponse(404, {}, "Error deleting question"))
+  const questionId = req.params?.id;
+  const question = await Question.find({
+    _id: questionId,
+    author: req.user._id,
+  });
+  if (!question) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, {}, "Error deleting question"));
   }
-  await Question.findByIdAndDelete(question._id)
-  res.status(200).json(new ApiResponse(200, question, "Question deleted successfully"))
+  await Question.findByIdAndDelete(question._id);
+  res
+    .status(200)
+    .json(new ApiResponse(200, question, "Question deleted successfully"));
 });
 
-export {
-  addQuestion,
-  getAllQuestions,
-  getQuestion,
-  deleteQuestion,
-};
+export { addQuestion, getAllQuestions, getQuestion, deleteQuestion };
