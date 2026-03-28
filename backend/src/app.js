@@ -42,6 +42,8 @@ app.use("/api/users", userRouter)
 
 app.use("/api/questions", questionRouter)
 
+// app.use("/api/chat")
+
 app.use(errorHandler);
 
 export default app;
