@@ -12,7 +12,7 @@ app.use(
   cors({
     origin: (origin, callback) => {
       const allowedOrigins = process.env.CORS_ORIGIN.split(",");
-      if (!origin || !allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -35,6 +35,9 @@ app.use((req, res, next) => {
 import authRouter from "./modules/auth/auth.route.js";
 import userRouter from "./modules/users/user.route.js"
 import questionRouter from "./modules/questions/question.routes.js"
+import chatRouter from "./modules/chats/chat.route.js"
+import {serve} from "inngest/express"
+import { inngest } from "./inngest/client.js";
 
 app.use("/api/auth", authRouter);
 
@@ -42,7 +45,16 @@ app.use("/api/users", userRouter)
 
 app.use("/api/questions", questionRouter)
 
-// app.use("/api/chat")
+app.use("/api/chat", chatRouter)
+
+// serving inngest
+app.use(
+  "/api/inngest",
+  serve({
+    client: inngest,
+    functions: [],
+  })
+);
 
 app.use(errorHandler);
 
