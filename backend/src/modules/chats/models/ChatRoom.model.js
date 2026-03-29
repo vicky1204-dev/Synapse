@@ -16,8 +16,6 @@ const chatRoomSchema = new mongoose.Schema({
   summaryLastMessageId: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
   summaryUpdatedAt: Date,
 
-  messageCount: { type: Number, default: 0 },
-
   isActive: { type: Boolean, default: true },
 
   expiresAt: Date,
