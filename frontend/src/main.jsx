@@ -5,11 +5,15 @@ import { AuthProvider } from "./auth/AuthContext.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SmoothScroll from "./utils/SmoothScroll.jsx";
+
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
+      <SmoothScroll>
       <App />
+      </SmoothScroll>
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -19,7 +23,7 @@ createRoot(document.getElementById("root")).render(
           padding: 0,
           boxShadow: "none",
           width: "fit-content",
-          top: "96px"
+          top: "96px",
         }}
         bodyStyle={{
           padding: 0,
