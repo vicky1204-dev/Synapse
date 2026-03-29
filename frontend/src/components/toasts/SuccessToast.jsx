@@ -6,14 +6,14 @@ const SuccessToast = ({ message, closeToast, title="" }) => {
       <div className="bg-bg-secondary p-4 rounded-l-lg h-full">
         <CircleCheckBig color="lightgreen" strokeWidth={2} size={24} />
       </div>
-      <div className="flex flex-col py-2 px-3">
+      <div className="flex flex-col py-2 px-3 gap-1">
         <h1 className="text-white flex items-center justify-between gap-4">
                {title ? title : "Success"}
           <span onClick={closeToast} className="cursor-pointer">
             <X  size={18}/>
           </span>
         </h1>
-        <p className="text-xs text-text-secondary">{message}</p>
+        <p className="text-xs text-text-secondary pr-2">{message}</p>
       </div>
     </div>
   );

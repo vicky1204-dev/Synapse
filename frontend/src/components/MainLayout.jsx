@@ -29,7 +29,8 @@ const MainLayout = () => {
         <div className="flex-1 relative min-h-screen bg-white/15">
           <AnimatePresence mode="wait">
             //since i am animating 2 elements and animatepresence expects only
-            one direct child so wrap them with div with key
+            one direct child so wrap them with div with key, where the key changes as location changes
+            
             <motion.div key={location.pathname}>
               {/* SLIDER ******** */}
               <motion.div

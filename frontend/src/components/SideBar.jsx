@@ -88,7 +88,7 @@ const SideBar = () => {
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1, transition: { duration: 0.3 } }}
-        className="h-full flex flex-col justify-between py-8 px-4 border border-white/20 rounded-lg bg-black"
+        className="h-full flex flex-col justify-between py-8 px-4 border border-white/15 rounded-lg bg-black"
       >
         <Link to="/" className="flex items-center justify-center">
           <motion.img
@@ -152,9 +152,9 @@ const SideBar = () => {
                               ></motion.div>
                             )}
                             <div
-                              className={`p-2 rounded-sm border w-fit h-fit z-10 mix-blend-difference border-white/20 text-text-secondary`}
+                              className={`p-2 rounded-sm border w-fit h-fit z-10  ${isActive ? "text-black border-black/20" : "text-text-secondary border-white/20"}`}
                             >
-                              <IconComponent strokeWidth={1} size={18} />
+                              <IconComponent  strokeWidth={1} size={18} />
                             </div>
 
                             <div className="flex flex-col items-start justify-center z-10">
@@ -184,7 +184,7 @@ const SideBar = () => {
           {user && user.avatar ? (
             <>
               <Link
-                to={"/users/user/profile"}
+                to={"/users/profile"}
                 className="flex items-center justify-center gap-2 text-sm"
               >
                 <div className="bg-white  w-8 h-8  rounded-full flex items-center justify-center">
@@ -193,7 +193,7 @@ const SideBar = () => {
                     className="object-cover  w-8 h-8  rounded-full opacity-40"
                   />
                 </div>
-                Profile
+                {user.username}
               </Link>
               <button
                 onClick={async () => {

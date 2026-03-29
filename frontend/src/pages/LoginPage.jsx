@@ -23,7 +23,6 @@ const LoginPage = () => {
       const res = await login(form);
       setUser(res.data.data.user);
       toast(<SuccessToast message={"Login successful"} title="Welcome Back!"/>)
-      console.log("Login response: ", res.data.data.user)
       navigate("/study/questions");
     } catch (error) {
       toast(<ErrorToast message={error.response?.data?.message || "Login failed"}/>)
