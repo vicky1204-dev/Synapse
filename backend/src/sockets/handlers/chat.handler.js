@@ -1,5 +1,5 @@
 import { EVENTS } from "../events.js";
-import { Message } from "../../modules/chat/message.model.js";
+import { Message } from "../../modules/chats/models/Message.model.js";
 import { emitNewMessage } from "../emitters/chat.emitter.js";
 
 export const registerChatHandlers = (io, socket) => {
@@ -13,25 +13,25 @@ export const registerChatHandlers = (io, socket) => {
   });
 
   socket.on(EVENTS.CHAT_SEND, async (data) => {
-    const { roomId, content, userId, type, receiverId } = data;
-
+    const { roomId, content, type, receiverId } = data;
     let message;
-
     if (type === "room") {
       message = await Message.create({
-        sender: userId,
+        sender: socket.userId,
         content,
         chatRoomId: roomId,
       });
     } else {
       message = await Message.create({
-        sender: userId,
+        sender: socket.userId,
         content,
         conversationId: roomId,
       });
     }
 
+    const populatedMsg = await message.populate("sender", "username avatar");
+
     // 🔥 use emitter instead of direct emit
-    emitNewMessage(io, { message, roomId, receiverId });
+    emitNewMessage(io, { message: populatedMsg, roomId, receiverId });
   });
 };

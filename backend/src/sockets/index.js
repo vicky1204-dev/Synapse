@@ -7,6 +7,7 @@ export const initSockets = (io) => {
     const userId = socket.handshake.auth?.userId;
 
     if (userId) {
+      socket.userId = userId;
       socket.join(userId); // 🔥 personal room, allows Backend → send notification to specific user
     }
 
