@@ -21,14 +21,15 @@ const PageHeader = ({ title, notifications = [] }) => {
   }, [scrollY]);
 
   return (
-    <header className="sticky top-0 pt-6 bg-black">
+    <header className="sticky top-0 pt-6 bg-black z-10">
       <div className="flex justify-between items-center">
         <motion.h1
-          initial={{ opacity: 0, filter: "blur(12px)", fontSize: 60 }}
+          className="leading-0 text-6xl origin-left flex items-center gap-2 font-light"
+          initial={{ opacity: 0, filter: "blur(12px)"}}
           animate={{
             opacity: 1,
             filter: "blur(0px)",
-            fontSize: shrink ? 30 : 60,
+            scale: shrink ? 0.5 : 1,  
           }}
           transition={{
             opacity: { duration: 0.6, ease: "easeOut" },
@@ -61,7 +62,7 @@ const PageHeader = ({ title, notifications = [] }) => {
         </motion.div>
       </div>
       <motion.div
-        className="w-full h-px bg-white/50 mt-3"
+        className="w-full h-px bg-white/15 mt-3"
         initial={{ width: "0%" }}
         animate={{ width: "100%" }}
         transition={{

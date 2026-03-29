@@ -4,13 +4,14 @@ import { toast } from "react-toastify";
 import eventEmitter from "../utils/eventEmitter.js";
 import ErrorToast from "../components/toasts/ErrorToast.jsx";
 import SuccessToast from "../components/toasts/SuccessToast.jsx";
-
+import { createSocket } from "../socket/socket.js";
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState(null);
 
   //this is the initial hydration of user
   useEffect(() => {
@@ -28,22 +29,52 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
+//socket instance, depends on user state(logged in or not), works even when user logs in and page isnt refreshed or logs out
+useEffect(() => {
+  if (!user?.id) {
+    setSocket(null);
+    return;
+  }
+
+  const newSocket = createSocket(user.id);
+  setSocket(newSocket);
+
+  newSocket.on("notification:new", () => {
+    toast.info("New message received");
+  });
+
+  newSocket.on("question:ai:completed", () => {
+    toast.success("AI processing done!");
+  });
+
+  return () => {
+    newSocket.off("notification:new");
+    newSocket.off("question:ai:completed");
+    newSocket.disconnect();
+  };
+}, [user]);
+
+
   // Listening for logout event
   useEffect(() => {
     const handleLogout = (payload) => {
       setUser(null);
+      setSocket(null);
 
       if (payload?.reason === "session_expired") {
-        toast(<ErrorToast message={"Session expired. Please login."}/>);
+        toast(<ErrorToast message={"Session expired. Please login."} />);
       } else {
-        toast(<SuccessToast message={"Logged out successfully."} title="Logout"/>);
+        toast(
+          <SuccessToast message={"Logged out successfully."} title="Logout" />,
+        );
       }
     };
 
     eventEmitter.on("logout", handleLogout);
 
+    // this is cleanup, runs on unmount
     return () => {
-      eventEmitter.off("logout", handleLogout); 
+      eventEmitter.off("logout", handleLogout);
       // Because if you don’t remove the listener:
       // eventEmitter.on("logout", handleLogout);
       // and the component re-mounts later, you’d register:
@@ -52,7 +83,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser, socket, loading }}>
       {children}
     </AuthContext.Provider>
   );

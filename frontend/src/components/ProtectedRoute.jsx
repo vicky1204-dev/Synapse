@@ -5,8 +5,7 @@ const ProtectedRoute = ({children}) => {
 
   return (
   <>
-  {loading && <div>...loading</div>}
-  {!user && <div>Sign In pleeeeaèeeeeeeeeeeeeeeeeee</div>}
+  {loading ? <div>...loading</div> : !user ? <div>Log In Please</div> : children}
   </>
   )
 }

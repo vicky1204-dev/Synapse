@@ -12,7 +12,7 @@ const Dialog = ({ isOpen, onClose, children, buttonText }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 z-20 backdrop-blur-sm"
+            className="fixed inset-0 z-60 backdrop-blur-sm"
             onClick={onClose}
           ></motion.div>
 
@@ -22,7 +22,7 @@ const Dialog = ({ isOpen, onClose, children, buttonText }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 bg-bg-secondary border border-white/20 rounded-lg p-6 shadow-xl"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-70 bg-black border border-white/20 rounded-lg p-6 shadow-xl"
           >
             {children}
           </motion.div>
