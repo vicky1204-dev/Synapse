@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import eventEmitter from "../utils/eventEmitter.js";
 import ErrorToast from "../components/toasts/ErrorToast.jsx";
 import SuccessToast from "../components/toasts/SuccessToast.jsx";
+import InfoToast from "../components/toasts/InfoToast.jsx";
 import { createSocket } from "../socket/socket.js";
 
 export const AuthContext = createContext(null);
@@ -29,31 +30,35 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
-//socket instance, depends on user state(logged in or not), works even when user logs in and page isnt refreshed or logs out
-useEffect(() => {
-  if (!user?.id) {
-    setSocket(null);
-    return;
-  }
+  //socket instance, depends on user state(logged in or not), works even when user logs in and page isnt refreshed or logs out
+  useEffect(() => {
+    if (!user?.id) {
+      setSocket(null);
+      return;
+    }
 
-  const newSocket = createSocket(user.id);
-  setSocket(newSocket);
+    const newSocket = createSocket(user.id);
+    setSocket(newSocket);
 
-  newSocket.on("notification:new", () => {
-    toast.info("New message received");
-  });
+    newSocket.on("notification:new", (data) => {
+      switch (data.type) {
+        case "question:ai:started":
+          toast(<InfoToast message={data.message} />);
+          break;
+        case "question:ai:completed":
+          toast(<SuccessToast message={data.message} />);
+          break;
+        default:
+          toast(<InfoToast message={data.message || "New Notification"} />);
+      }
+    });
 
-  newSocket.on("question:ai:completed", () => {
-    toast.success("AI processing done!");
-  });
-
-  return () => {
-    newSocket.off("notification:new");
-    newSocket.off("question:ai:completed");
-    newSocket.disconnect();
-  };
-}, [user]);
-
+    return () => {
+      newSocket.off("notification:new");
+      newSocket.off("question:ai:completed");
+      newSocket.disconnect();
+    };
+  }, [user]);
 
   // Listening for logout event
   useEffect(() => {

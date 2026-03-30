@@ -1,12 +1,5 @@
-import { EVENTS } from "../events";
+import { EVENTS } from "../events.js";
 
-export const emitAiStarted = (io, userId, questionId) => {
-    io.to(userId).emit(EVENTS.QUESTION_AI_STARTED, {
-        questionId,
-    })
-}
-
-export const emitAICompleted = (io, userId, data) => {
-  io.to(userId).emit(EVENTS.QUESTION_AI_COMPLETED, data);
+export const emitNotification = (io, userId, payload) => {
+  io.to(userId).emit(EVENTS.NOTIFICATION_NEW, payload);
 };
-

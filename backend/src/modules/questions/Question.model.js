@@ -8,11 +8,15 @@ const questionSchema = new Schema(
     },
     body: {
       type: String,
+      default: "",
     },
     tags: [{ type: String }],
     requiredSkills: [{ type: String }],
 
-    aiTips: String,
+    aiTips: {
+      type: String,
+      default: ""
+    },
 
     author: {
       type: Schema.Types.ObjectId,
@@ -22,7 +26,7 @@ const questionSchema = new Schema(
 
     isClosed: {
       type: Boolean,
-      default: false
+      default: false,
     },
 
     closedReason: {
@@ -42,15 +46,16 @@ const questionSchema = new Schema(
     },
     answerCount: {
       type: Number,
+      default: 0
     },
 
     upvotes: {
       type: Number,
-      default: 0
+      default: 0,
     },
     downvotes: {
       type: Number,
-      default: 0
+      default: 0,
     },
 
     moderationStatus: {

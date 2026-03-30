@@ -1,4 +1,4 @@
-import express, { urlencoded } from "express";
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import { errorHandler } from "./middlewares/error.middleware.js";
@@ -27,33 +27,34 @@ app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 app.use((req, res, next) => {
-    logger.info(`Recieved ${req.method} request to ${req.url}`)
-    next()
+  logger.info(`Recieved ${req.method} request to ${req.url}`);
+  next();
 });
 
 //importing routes
 import authRouter from "./modules/auth/auth.route.js";
-import userRouter from "./modules/users/user.route.js"
-import questionRouter from "./modules/questions/question.routes.js"
-import chatRouter from "./modules/chats/chat.route.js"
-import {serve} from "inngest/express"
+import userRouter from "./modules/users/user.route.js";
+import questionRouter from "./modules/questions/question.routes.js";
+import chatRouter from "./modules/chats/chat.route.js";
+import { serve } from "inngest/express";
 import { inngest } from "./inngest/client.js";
+import { onQuestionCreated } from "./inngest/functions/onQuestionCreated.js";
 
 app.use("/api/auth", authRouter);
 
-app.use("/api/users", userRouter)
+app.use("/api/users", userRouter);
 
-app.use("/api/questions", questionRouter)
+app.use("/api/questions", questionRouter);
 
-app.use("/api/chat", chatRouter)
+app.use("/api/chat", chatRouter);
 
 // serving inngest
 app.use(
   "/api/inngest",
   serve({
     client: inngest,
-    functions: [],
-  })
+    functions: [onQuestionCreated],
+  }),
 );
 
 app.use(errorHandler);

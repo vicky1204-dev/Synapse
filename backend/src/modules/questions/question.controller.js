@@ -3,6 +3,7 @@ import { ApiResponse } from "../../utils/apiResponse.util.js";
 import { logger } from "../../utils/logger.util.js";
 import Question from "./Question.model.js";
 import { validateAddQuestion } from "./question.validator.js";
+import { inngest } from "../../inngest/client.js";
 
 const addQuestion = asyncHandler(async (req, res) => {
   logger.info("Add question endpoint hit");
@@ -21,6 +22,14 @@ const addQuestion = asyncHandler(async (req, res) => {
     body,
     tags,
     author: req.user._id,
+  });
+
+  await inngest.send({
+    name: "question/created",
+    data: {
+      questionId: newQuestion._id.toString(),
+      author: req.user._id
+    },
   });
 
   res
@@ -71,7 +80,7 @@ const getQuestion = asyncHandler(async (req, res) => {
 const deleteQuestion = asyncHandler(async (req, res) => {
   logger.info("Delete question endpoint hit");
   const questionId = req.params?.id;
-  const question = await Question.find({
+  const question = await Question.findOne({
     _id: questionId,
     author: req.user._id,
   });
