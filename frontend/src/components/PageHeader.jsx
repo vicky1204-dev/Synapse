@@ -4,7 +4,7 @@ import { useMainContext } from "../context/MainContext";
 import { useState, useEffect } from "react";
 
 const PageHeader = ({ title, notifications = [] }) => {
-  const { setSidebarVisible } = useMainContext();
+  const { setSidebarVisible, setNotificationVisible } = useMainContext();
   const { scrollY } = useScroll();
   const [shrink, setShrink] = useState(false);
 
@@ -53,7 +53,9 @@ const PageHeader = ({ title, notifications = [] }) => {
           >
             <Menu strokeWidth={1} />
           </div>
-          <div className="w-fit p-3 border border-white/20 rounded-sm relative cursor-pointer">
+          <div 
+           onClick={() => setNotificationVisible((prev) => !prev)}
+          className="w-fit p-3 border border-white/20 rounded-sm relative cursor-pointer">
             <Bell strokeWidth={1} />
             <p className="absolute rounded-full w-4 aspect-square bg-blue-600 top-1 p-0.5 text-center right-1 text-[10px]">
               {notifications.length}

@@ -3,10 +3,12 @@ import SideBar from "./SideBar";
 import { useLocation, useOutlet } from "react-router-dom";
 import { useRef, useLayoutEffect, useState } from "react";
 import { MainContext } from "../context/MainContext";
+import NotificationPanel from "./NotificationPanel";
 //Use useLayoutEffect (not useEffect) so measurement happens before paint:
 
 const MainLayout = () => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [notificationVisible, setNotificationVisible] = useState(false)
   const location = useLocation();
   const outlet = useOutlet();
   const contentRef = useRef(null);
@@ -19,7 +21,10 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <MainContext.Provider value={{ setSidebarVisible }}>
+    <MainContext.Provider value={{ setSidebarVisible, setNotificationVisible }}>
+      <div className={`fixed right-0 top-0 bottom-0 z-70 ${notificationVisible ? "translate-0" : "translate-x-full"} duration-200 ease-in-out`}>
+        <NotificationPanel/>
+      </div>
       <div className="min-h-screen w-full flex">
         <div
           className={`sm:sticky fixed left-0 top-0 h-screen flex-[0,0,auto] sm:py-8 sm:pl-8 z-50 opacity-0 ${sidebarVisible ? " translate-x-0 opacity-100 " : "-translate-x-full"} sm:translate-x-0 sm:opacity-100 duration-300`}
@@ -32,7 +37,7 @@ const MainLayout = () => {
             one direct child so wrap them with div with key, where the key changes as location changes
             
             <motion.div key={location.pathname}>
-              {/* SLIDER ******** */}
+              {/* Page transition SLIDER ******** */}
               <motion.div
                 className="fixed inset-y-0 right-0 bg-black z-40 pointer-events-none"
                 style={{
