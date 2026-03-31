@@ -1,6 +1,6 @@
 import PageHeader from "../components/PageHeader";
 import AddComponent from "../components/AddComponent";
-import { Plus } from "lucide-react";
+import { Divide, Plus } from "lucide-react";
 import Dialog from "../components/Dialog";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,9 @@ import { api } from "../utils/axios";
 import { toast } from "react-toastify";
 import ErrorToast from "../components/toasts/ErrorToast";
 import SuccessToast from "../components/toasts/SuccessToast";
+import { AnimatePresence, motion } from "framer-motion";
+import SkeletonLoader from "../components/SkeletonLoader";
+import { containerVariants, itemVariants } from "../animations/variants.js";
 
 const DiscussionsPage = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -25,7 +28,7 @@ const DiscussionsPage = () => {
     try {
       const res = await api.post("/chat/rooms", discussionRoomForm);
       console.log(res.data.data._id);
-      await api.post(`/chat/rooms/${res.data.data._id}/join`)
+      await api.post(`/chat/rooms/${res.data.data._id}/join`);
       toast(<SuccessToast message={"Room created successfully!"} />);
       setDialogOpen(false);
       navigate(`/study/discussions/${res.data.data._id}`);
@@ -57,13 +60,13 @@ const DiscussionsPage = () => {
   }
 
   async function onClickHandler(roomId) {
-  try {
-    await api.post(`/chat/rooms/${roomId}/join`);
-    navigate(`/study/discussions/${roomId}`);
-  } catch (error) {
-    toast(<ErrorToast message={"Failed to join room"} />);
+    try {
+      await api.post(`/chat/rooms/${roomId}/join`);
+      navigate(`/study/discussions/${roomId}`);
+    } catch (error) {
+      toast(<ErrorToast message={"Failed to join room"} />);
+    }
   }
-}
 
   useEffect(() => {
     fetchRooms();
@@ -75,7 +78,6 @@ const DiscussionsPage = () => {
       <AddComponent
         meta="Want to discuss a topic?"
         buttonText="Start a discussion"
-        icon={Plus}
         onClick={() => setDialogOpen(true)}
       />
       <Dialog isOpen={isDialogOpen} onClose={() => setDialogOpen(false)}>
@@ -118,54 +120,87 @@ const DiscussionsPage = () => {
           </button>
         </div>
       </Dialog>
-      {loading ? "Loading..." : roomList.map((rooms, index) => {
-        return (
-          <div
-            key={rooms._id}
-            className="flex flex-col border border-white/15 duration-300 p-4 rounded-lg gap-6 hover:border-white/30"
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="loading"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            exit="exit"
+            className="flex flex-col gap-4"
           >
-            <div className="flex justify-between">
-              <div className="text-xs flex items-center justify-center gap-1">
-                <div className="w-6 h-6 gap-1 rounded-full bg-white/30 p-px">
-                  <img
-                    src={
-                      rooms.createdBy.avatar
-                        ? rooms.createdBy.avatar
-                        : "/assets/user-round.svg"
-                    }
-                    className="rounded-full object-cover"
-                    alt=""
-                  />
+            <SkeletonLoader />
+          </motion.div>
+        ) : roomList.length !== 0 ? (
+          <motion.div
+            key="list"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            exit="exit"
+            className="flex flex-col gap-4"
+          >
+          {roomList.map((rooms, index) => {
+            return (
+              <div
+                key={rooms._id}
+                className="flex flex-col border border-white/15 duration-300 p-4 rounded-lg gap-6 hover:border-white/30"
+              >
+                <div className="flex justify-between">
+                  <div className="text-xs flex items-center justify-center gap-1">
+                    <div className="w-6 h-6 gap-1 rounded-full bg-white/30 p-px">
+                      <img
+                        src={
+                          rooms.createdBy.avatar
+                            ? rooms.createdBy.avatar
+                            : "/assets/user-round.svg"
+                        }
+                        className="rounded-full object-cover"
+                        alt=""
+                      />
+                    </div>
+                    <h1>{rooms.createdBy.username}</h1>
+                  </div>
+                  {rooms.isActive ? (
+                    <div className="text-xs px-2 py-1 rounded-full flex bg-red-500 text-black gap-1">
+                      {" "}
+                      Live
+                    </div>
+                  ) : (
+                    <div className="text-xs px-2 py-1 rounded-full bg-text-secondary text-black">
+                      Ended
+                    </div>
+                  )}
                 </div>
-                <h1>{rooms.createdBy.username}</h1>
+                <div className="flex flex-col gap-1 px-2">
+                  <h1>{rooms.name}</h1>
+                  {rooms.subject && (
+                    <p className="text-text-secondary">{rooms.subject}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => onClickHandler(rooms._id)}
+                  className=" bg-bg-secondary rounded-full py-3 px-4 cursor-pointer flex justify-center items-center gap-2 text-sm text-text-secondary hover:text-white border border-black hover:border-white/15 duration-200 ease-in-out w-fit"
+                >
+                  Join Discussion
+                  <Plus size={18} strokeWidth={1} />
+                </button>
               </div>
-              {rooms.isActive ? (
-                <div className="text-xs px-2 py-1 rounded-full flex bg-red-500 text-black gap-1">
-                  {" "}
-                  Live
-                </div>
-              ) : (
-                <div className="text-xs px-2 py-1 rounded-full bg-text-secondary text-black">
-                  Ended
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col gap-1 px-2">
-              <h1>{rooms.name}</h1>
-              {rooms.subject && (
-                <p className="text-text-secondary">{rooms.subject}</p>
-              )}
-            </div>
-            <button
-              onClick={() => onClickHandler(rooms._id)}
-              className=" bg-bg-secondary rounded-full py-3 px-4 cursor-pointer flex justify-center items-center gap-2 text-sm text-text-secondary hover:text-white border border-black hover:border-white/15 duration-200 ease-in-out w-fit"
-            >
-              Join Discussion
-              <Plus size={18} strokeWidth={1} />
-            </button>
-          </div>
-        );
-      })}
+            );
+          })}
+          </motion.div>
+        ) : (
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate="show"
+            exit="exit"
+          >
+            No rooms found
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

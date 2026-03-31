@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import AddComponent from "../components/AddComponent";
 import { useEffect, useState } from "react";
@@ -10,6 +9,8 @@ import Dialog from "../components/Dialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { CircleCheckBig, X, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SkeletonLoader from "../components/SkeletonLoader";
+import {containerVariants, itemVariants} from "../animations/variants.js"
 
 const QuestionsPage = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -65,7 +66,6 @@ const QuestionsPage = () => {
       <AddComponent
         meta="Got doubts?"
         buttonText="Ask a Question"
-        icon={Plus}
         onClick={() => setDialogOpen(true)}
       />
       <Dialog isOpen={isDialogOpen} onClose={() => setDialogOpen(false)}>
@@ -107,36 +107,30 @@ const QuestionsPage = () => {
 
       {/* QUESTRIONSSSSSS ******** */}
       <AnimatePresence mode="wait">
-        {loading
-          ? Array.from({ length: 4 }).map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  backgroundPosition: ["200% 0%", "-200% 0%"],
-                }}
-                exit={{
-                  opacity: 0,
-                  transition: { duration: 0.3, delay: i * 0.1 },
-                }}
-                transition={{
-                  backgroundPosition: {
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: "linear",
-                  },
-                }}
-                className="h-40 bg-linear-to-r from-bg-secondary via-white/10 to-bg-secondary bg-size-[200%_100%] w-full rounded-lg"
-              />
-            ))
-          : questionsList.map((question, index) => {
+        {loading ? (
+          <motion.div
+            key="loading"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            exit="exit"
+            className="flex flex-col gap-4"
+          >
+            <SkeletonLoader />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="list"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            exit="exit"
+            className="flex flex-col gap-4"
+          >
+            {questionsList.map((question, index) => {
               return (
                 <motion.div
-                  initial={{ opacity: 0, y: 20, filter: "blur(12px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0)" }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  variants={itemVariants}
                   key={question._id}
                   onClick={() => navigate(`/study/questions/${question._id}`)}
                   className="flex flex-col border border-white/15 cursor-pointer hover:border-white/30 duration-300 p-4 rounded-lg gap-4"
@@ -185,6 +179,8 @@ const QuestionsPage = () => {
                 </motion.div>
               );
             })}
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );
