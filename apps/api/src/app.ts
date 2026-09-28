@@ -31,11 +31,7 @@ export function createApp() {
       credentials: true,
     }),
   );
-
-  // ---------------------------------------------------------------------------
-  // Request infrastructure
-  // ---------------------------------------------------------------------------
-
+  
   // Attach a unique ID to every request for log correlation.
   app.use(requestId);
 

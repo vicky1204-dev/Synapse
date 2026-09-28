@@ -18,6 +18,8 @@ const envSchema = z.object({
 
   PORT: z.coerce.number().int().positive().default(4000),
 
+  /** MongoDB connection string. Never log this value. */
+  MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
   /**
    * Comma-separated list of allowed CORS origins.
    * Example: http://localhost:3000,https://synapse.app

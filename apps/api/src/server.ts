@@ -3,6 +3,7 @@
  *
  * Responsible for:
  * - Loading environment variables
+ * - Connecting to MongoDB
  * - Creating the HTTP server
  * - Binding to the configured port
  * - Graceful shutdown on SIGTERM / SIGINT
@@ -15,6 +16,7 @@ import "dotenv/config";
 import http from "http";
 import { env } from "./config/env";
 import { logger } from "./lib/logger";
+import { connectDB, disconnectDB } from "./lib/db";
 import { createApp } from "./app";
 
 // ---------------------------------------------------------------------------
@@ -24,13 +26,19 @@ import { createApp } from "./app";
 const app = createApp();
 const server = http.createServer(app);
 
-server.listen(env.PORT, () => {
-  logger.info({
-    message: "Synapse API started",
-    port: env.PORT,
-    env: env.NODE_ENV,
+// Boot sequence: connect to MongoDB, then start accepting HTTP requests.
+(async () => {
+  await connectDB();
+
+  server.listen(env.PORT, () => {
+    logger.info({
+      message: "Synapse API started",
+      port: env.PORT,
+      env: env.NODE_ENV,
+    });
   });
-});
+})();
+
 
 // ---------------------------------------------------------------------------
 // Graceful shutdown
@@ -46,12 +54,13 @@ server.listen(env.PORT, () => {
 function shutdown(signal: string) {
   logger.info({ message: `Received ${signal}. Shutting down gracefully.` });
 
-  server.close((err) => {
+  server.close(async (err) => {
     if (err) {
       logger.error({ message: "Error during shutdown", error: err.message });
       process.exit(1);
     }
 
+    await disconnectDB();
     logger.info({ message: "Server closed. Exiting." });
     process.exit(0);
   });
