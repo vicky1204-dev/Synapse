@@ -50,6 +50,7 @@ User {
 ```
 
 Indexes:
+
 - unique `email`
 - optionally `subjectIds` only if query requirements justify it
 
@@ -70,6 +71,7 @@ Subject {
 ```
 
 Unique index:
+
 - `slug`
 
 Subjects prevent every onboarding user from inventing slightly different strings.
@@ -103,6 +105,7 @@ Course {
 ```
 
 Indexes:
+
 - `{ ownerId: 1, status: 1 }`
 - `{ ownerId: 1, subjectId: 1 }`
 
@@ -181,6 +184,7 @@ Resource {
 ```
 
 Indexes:
+
 - `{ courseId: 1, createdAt: -1 }`
 - `{ visibility: 1, createdAt: -1 }`
 - text/search indexes only after real search requirements are known
@@ -272,6 +276,7 @@ StudyProgress {
 ```
 
 Unique compound index:
+
 - `{ userId: 1, courseId: 1 }`
 
 This is a read-optimized projection. Individual activity completion records remain the detailed source for activity-level state.
@@ -292,6 +297,7 @@ ActivityProgress {
 ```
 
 Unique compound index:
+
 - `{ userId: 1, activityId: 1 }`
 
 ## 10. FlashcardReview
@@ -344,6 +350,7 @@ Discussion {
 ```
 
 Indexes:
+
 - `{ courseId: 1, createdAt: -1 }`
 - `{ resourceId: 1, createdAt: -1 }`
 - `{ createdAt: -1 }`
@@ -379,6 +386,7 @@ SavedResource {
 ```
 
 Unique compound index:
+
 - `{ userId: 1, resourceId: 1 }`
 
 ## 15. CreditAccount
@@ -396,6 +404,7 @@ CreditAccount {
 ```
 
 Unique:
+
 - `userId`
 
 ## 16. CreditTransaction
@@ -419,18 +428,23 @@ Use transactions when balance and transaction records must change atomically.
 ## 17. What is intentionally not a collection
 
 ### Contributions
+
 Compute contribution statistics from authored resources, discussions and comments initially.
 
 ### Course resources array
+
 Do not duplicate the relationship on Course.
 
 ### Chat / Message
+
 Not needed for V1.
 
 ### Notification
+
 Add when an actual notification UX exists.
 
 ### Enrollment
+
 Not required while Courses are personal containers owned by a user.
 
 ## 18. Important invariant

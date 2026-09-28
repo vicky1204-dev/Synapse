@@ -60,7 +60,6 @@ export class ConflictError extends ApiError {
   }
 }
 
-
 export function errorHandler(
   err: unknown,
   req: Request,

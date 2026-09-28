@@ -161,6 +161,7 @@ GET /credits/transactions
 ### Pagination
 
 Use:
+
 - `page`
 - `limit`
 - explicit maximum limit
@@ -187,6 +188,7 @@ Do not pass arbitrary MongoDB sort fields from the client.
 ### Validation
 
 Validate:
+
 - path params
 - query params
 - body

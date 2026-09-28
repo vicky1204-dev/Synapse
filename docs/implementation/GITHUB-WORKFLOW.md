@@ -5,6 +5,7 @@
 Create a GitHub Project with:
 
 ### Status
+
 ```text
 Backlog
 Ready
@@ -16,6 +17,7 @@ Done
 ### Custom fields
 
 Priority:
+
 ```text
 P0
 P1
@@ -23,6 +25,7 @@ P2
 ```
 
 Effort:
+
 ```text
 XS
 S
@@ -32,6 +35,7 @@ XL
 ```
 
 Sprint:
+
 ```text
 Sprint 0
 Sprint 1
@@ -41,6 +45,7 @@ Sprint 3
 ```
 
 Type:
+
 ```text
 Feature
 Bug
@@ -51,6 +56,7 @@ Chore
 ```
 
 Area:
+
 ```text
 Frontend
 Backend
@@ -64,10 +70,13 @@ Infrastructure
 ## 2. Views
 
 ### Kanban
+
 Group by Status.
 
 ### Table
+
 Columns:
+
 - Title
 - Type
 - Area
@@ -78,6 +87,7 @@ Columns:
 - Milestone
 
 ### Optional roadmap
+
 Group by Milestone.
 
 ## 3. Labels
@@ -112,12 +122,15 @@ Do not duplicate `type` and `priority` in both labels and custom fields unless y
 ## 4. Milestones
 
 ### MVP
+
 Foundation + auth + onboarding + courses + resources + basic study flow.
 
 ### Beta
+
 Study Packs + discussions + progress + hardening.
 
 ### v1.0
+
 Production polish, accessibility, performance, reliability and final UX.
 
 ## 5. Issue hierarchy
@@ -201,6 +214,7 @@ chore: establish application foundation
 ```
 
 can close issues for:
+
 - Next.js setup
 - API setup
 - MongoDB setup
@@ -255,6 +269,7 @@ Vertical feature slices
 ## 10. Agent workflow
 
 Before giving an agent a task:
+
 - give it the issue number;
 - point it to the relevant docs;
 - specify the acceptance criteria;

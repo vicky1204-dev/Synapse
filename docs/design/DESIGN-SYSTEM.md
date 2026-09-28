@@ -5,6 +5,7 @@
 Synapse is a calm academic workspace with a soft, spacious visual language.
 
 Characteristics:
+
 - generous whitespace
 - large rounded surfaces
 - restrained neutral palette
@@ -198,6 +199,7 @@ Primary expressive gradient:
 ```
 
 Use for:
+
 - selected progress
 - selected study states
 - hero/empty-state accents
@@ -208,6 +210,7 @@ Do not use gradients for every button or surface.
 ## 7. Expressive content colors
 
 External gradient palettes may be used for decorative content categories such as:
+
 - course folders
 - flashcard categories
 - study pack covers
@@ -219,10 +222,10 @@ Store expressive colors as data:
 
 ```ts
 type VisualAccent = {
-  background: string
-  foreground: string
-  gradient?: string
-}
+  background: string;
+  foreground: string;
+  gradient?: string;
+};
 ```
 
 Do not allow external palette choices to redefine `primary`, `background`, `foreground`, `destructive`, or `border`.
@@ -247,6 +250,7 @@ Use the shadcn base radius to derive smaller/larger tokens. Do not introduce doz
 ## 9. Typography
 
 Typography should be:
+
 - highly legible
 - neutral
 - generous in heading scale
@@ -260,11 +264,13 @@ Use the project's chosen font Manrope consistently. Heading and body fonts shoul
 The product relies more on borders and surface contrast than heavy shadows.
 
 Preferred:
+
 - 1px subtle border
 - surface color changes
 - restrained shadow only where a floating layer needs separation
 
 Avoid:
+
 - large drop shadows
 - glossy UI
 - excessive glassmorphism
@@ -274,6 +280,7 @@ Avoid:
 Use one icon family consistently through the application.
 
 Current visual reference:
+
 - light mode icon color: `#B0A8B8`
 - dark mode icon color: `#6D6D6D`
 - active/interactive icons may use semantic foreground/primary colors.
@@ -283,6 +290,7 @@ Current visual reference:
 Use Framer Motion only.
 
 Motion categories:
+
 - enter/exit
 - hover/tap
 - accordion/dialog state
@@ -297,6 +305,7 @@ Every animation must respect reduced-motion preferences.
 ## 13. Component states
 
 Every interactive component should consider:
+
 - default
 - hover
 - focus-visible
@@ -318,6 +327,7 @@ Focus indicators must remain visible in both themes.
 The project should use shadcn's CSS-variable approach rather than hard-coding Tailwind colors into each component.
 
 The global CSS file is the bridge between:
+
 - Synapse design tokens
 - shadcn primitives
 - Tailwind utilities
@@ -342,6 +352,7 @@ Raw color values should be restricted to theme definitions and deliberate visual
 Figma is the visual reference. This document is the implementation contract for the visual system.
 
 If Figma changes:
+
 1. update the design system;
 2. update affected tokens/components;
 3. update UI-UX documentation if behavior changes;

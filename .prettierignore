@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+out/
+build/
+
+# Generated files
+*.lock
+package-lock.json
+next-env.d.ts
+
+# Assets that should not be reformatted
+*.svg
+*.ico
+*.png
+*.jpg
+*.jpeg
+*.webp

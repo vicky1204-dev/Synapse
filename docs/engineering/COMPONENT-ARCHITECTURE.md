@@ -39,6 +39,7 @@ These are owned source files, not an external package you import as an opaque bl
 ## When to modify a shadcn primitive
 
 Modify it when:
+
 - the change is globally reusable;
 - it is a visual-system requirement;
 - it is a general accessibility/behavior correction;
@@ -90,6 +91,7 @@ features/courses/
 ```
 
 Repeat the pattern for:
+
 - auth
 - onboarding
 - home
@@ -142,6 +144,7 @@ Do not mark the entire page as `"use client"` merely because one child needs int
 ## Forms
 
 Use React Hook Form + Zod for:
+
 - onboarding
 - course creation
 - resource upload metadata

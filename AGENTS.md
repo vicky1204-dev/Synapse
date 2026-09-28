@@ -5,6 +5,7 @@
 This is a production-oriented college SaaS project.
 
 The human developer owns:
+
 - product decisions
 - UX decisions
 - visual design
@@ -50,6 +51,7 @@ The human developer owns visual direction.
 Agents should implement the provided design faithfully rather than inventing a new visual language.
 
 Preserve:
+
 - spacing system
 - typography
 - component hierarchy
@@ -61,11 +63,13 @@ Do not add gratuitous animations.
 ## Changes
 
 Before modifying code:
+
 1. Identify relevant files.
 2. Explain the implementation plan briefly if the task is non-trivial.
 3. Make the smallest coherent change.
 
 After modifying code:
+
 1. Run relevant checks.
 2. Fix issues caused by the change.
 
@@ -78,6 +82,7 @@ Do not commit unless explicitly requested.
 ## Documentation
 
 Update project documentation only when the change materially affects:
+
 - architecture
 - product behavior
 - development conventions
@@ -100,30 +105,39 @@ Feature isn't done until:
 ## Implementation Summary
 
 ### Changed
+
 - ...
 
 ### Added
+
 - ...
 
 ### Removed
+
 - ...
 
 ### API Changes
+
 - ...
 
 ### Schema Changes
+
 - ...
 
 ### Documentation Changes
+
 - ...
 
 ### Validation
+
 - Typecheck:
 - Lint:
 - Tests:
 
 ### Remaining Work
+
 - ...
 
 ### Risks
+
 - ...

@@ -9,6 +9,7 @@ docs: establish Synapse project documentation
 ```
 
 Includes:
+
 - PRD
 - App Flow
 - UI/UX
@@ -27,6 +28,7 @@ No application implementation is required for this commit.
 ## Phase 1 — Repository foundation
 
 Issues:
+
 1. Initialize monorepo
 2. Configure Next.js app
 3. Configure Express API

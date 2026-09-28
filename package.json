@@ -1,0 +1,15 @@
+{
+  "name": "synapse",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:web": "npm run lint --prefix apps/web",
+    "lint:api": "npm run lint --prefix apps/api"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.12"
+  }
+}

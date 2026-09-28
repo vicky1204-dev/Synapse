@@ -57,6 +57,7 @@ The browser never treats an event, socket message or optimistic UI state as the 
 ## 3. Why no RabbitMQ in V1
 
 Inngest already provides the durable event/workflow abstraction needed for:
+
 - resource processing
 - AI generation
 - retries
@@ -89,6 +90,7 @@ Next.js App Router.
 Server Components by default.
 
 Client Components for:
+
 - interactive forms
 - dialogs
 - tabs where state is client-owned
@@ -120,6 +122,7 @@ Mongoose model
 Do not create repositories for every collection merely because a pattern exists. Introduce one when it actually isolates complex data access.
 
 Each module owns:
+
 - model
 - validation
 - types
@@ -149,6 +152,7 @@ Cross-cutting infrastructure must not contain domain rules.
 Use structured logging through Winston.
 
 Log:
+
 - request IDs
 - operation names
 - durations
@@ -157,6 +161,7 @@ Log:
 - relevant user/entity IDs where safe
 
 Never log:
+
 - passwords
 - access tokens
 - refresh tokens
@@ -174,6 +179,7 @@ Clients should branch on `error.code`, not string matching.
 Authentication details are documented in the auth module implementation plan.
 
 The important architectural property is that:
+
 - the API owns session/auth state;
 - the web app consumes authenticated API state;
 - onboarding status is part of user/session data;

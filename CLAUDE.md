@@ -3,6 +3,7 @@
 Read AGENTS.md first.
 
 For feature implementation:
+
 1. Identify relevant GitHub issue.
 2. Read relevant docs.
 3. Inspect existing code.

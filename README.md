@@ -239,30 +239,30 @@ Long-running AI work is handled asynchronously through **Inngest**.
 
 ### Frontend
 
-| Technology | Purpose |
-|---|---|
-| Next.js | Application framework |
-| React | UI |
-| TypeScript | Type safety |
-| Tailwind CSS | Styling |
-| shadcn/ui | UI primitives |
-| Framer Motion | Interface motion |
-| TanStack Query | Server-state management |
-| Zustand | Client/application state |
-| React Hook Form | Form management |
+| Technology      | Purpose                  |
+| --------------- | ------------------------ |
+| Next.js         | Application framework    |
+| React           | UI                       |
+| TypeScript      | Type safety              |
+| Tailwind CSS    | Styling                  |
+| shadcn/ui       | UI primitives            |
+| Framer Motion   | Interface motion         |
+| TanStack Query  | Server-state management  |
+| Zustand         | Client/application state |
+| React Hook Form | Form management          |
 
 ### Backend
 
-| Technology | Purpose |
-|---|---|
-| Node.js | Runtime |
-| Express | HTTP API |
-| TypeScript | Type safety |
-| MongoDB | Persistent data |
-| Mongoose | MongoDB ODM |
-| Inngest | Background jobs/workflows |
-| Cloudinary | Media storage |
-| AI APIs | AI-powered learning features |
+| Technology | Purpose                      |
+| ---------- | ---------------------------- |
+| Node.js    | Runtime                      |
+| Express    | HTTP API                     |
+| TypeScript | Type safety                  |
+| MongoDB    | Persistent data              |
+| Mongoose   | MongoDB ODM                  |
+| Inngest    | Background jobs/workflows    |
+| Cloudinary | Media storage                |
+| AI APIs    | AI-powered learning features |
 
 ---
 

@@ -32,11 +32,7 @@ const devFormat = combine(
   }),
 );
 
-const prodFormat = combine(
-  timestamp(),
-  errors({ stack: true }),
-  json(),
-);
+const prodFormat = combine(timestamp(), errors({ stack: true }), json());
 
 // ---------------------------------------------------------------------------
 // Logger
