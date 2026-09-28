@@ -19,6 +19,7 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { NavMain, type NavItem } from "@/components/layout/nav-main";
 import { NavUser } from "./nav-user";
@@ -75,25 +76,33 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       {...props}
       className="gap-4 border-none py-4 pl-4"
     >
-      <SidebarHeader className="bg-background flex items-center gap-2.5 rounded-2xl px-4 py-3 shadow-sm group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
-        <Image
-          src="/synapse_logo.svg"
-          alt="Synapse"
-          width={24}
-          height={24}
-          className="size-6 shrink-0"
-          priority
-        />
-        <span className="text-sidebar-foreground text-base font-medium group-data-[collapsible=icon]:hidden">
-          Synapse
-        </span>
+      <SidebarHeader className="bg-background flex items-center justify-between rounded-2xl px-3 py-2.5 shadow-sm group-data-[collapsible=icon]:p-1.5 group-data-[collapsible=icon]:justify-center">
+        <div className="flex items-center gap-2.5 pl-1 group-data-[collapsible=icon]:hidden">
+          <Image
+            src="/synapse_logo.svg"
+            alt="Synapse"
+            width={24}
+            height={24}
+            className="size-6 shrink-0"
+            priority
+          />
+          <span className="text-sidebar-foreground text-sm font-medium">
+            Synapse
+          </span>
+        </div>
+        <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground size-8 shrink-0 rounded-xl" />
       </SidebarHeader>
 
       <SidebarContent>
-        <div className="bg-background mt-4 rounded-2xl shadow-sm">
+        <div className="bg-background mt-4 flex flex-col rounded-2xl p-1.5 shadow-sm">
           {navGroups.map((group) => (
-            <SidebarGroup key={group.label}>
-              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroup
+              key={group.label}
+              className="p-1 group-data-[collapsible=icon]:p-0"
+            >
+              <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
+                {group.label}
+              </SidebarGroupLabel>
               <SidebarGroupContent>
                 <NavMain items={group.items} />
               </SidebarGroupContent>
@@ -102,7 +111,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarContent>
 
-      <SidebarFooter className="bg-background rounded-full px-2 py-2 shadow-sm">
+      <SidebarFooter className="bg-background rounded-full p-1.5 shadow-sm group-data-[collapsible=icon]:p-1 group-data-[collapsible=icon]:justify-center">
         <NavUser user={currentUser} />
       </SidebarFooter>
     </Sidebar>

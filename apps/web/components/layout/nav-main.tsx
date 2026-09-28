@@ -1,36 +1,36 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { type LucideIcon } from "lucide-react"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { type LucideIcon } from "lucide-react";
 
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export interface NavItem {
-  title: string
-  href: string
-  icon: LucideIcon
+  title: string;
+  href: string;
+  icon: LucideIcon;
   /** Match exactly or prefix-match the pathname */
-  exact?: boolean
+  exact?: boolean;
 }
 
 interface NavMainProps {
-  items: NavItem[]
+  items: NavItem[];
 }
 
 export function NavMain({ items }: NavMainProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <SidebarMenu>
       {items.map((item) => {
         const isActive = item.exact
           ? pathname === item.href
-          : pathname === item.href || pathname.startsWith(item.href + "/")
+          : pathname === item.href || pathname.startsWith(item.href + "/");
 
         return (
           <SidebarMenuItem key={item.href}>
@@ -39,12 +39,14 @@ export function NavMain({ items }: NavMainProps) {
               tooltip={item.title}
               render={<Link href={item.href} />}
             >
-              <item.icon aria-hidden="true" />
-              <span>{item.title}</span>
+              <item.icon aria-hidden="true" className=" stroke-icon"/>
+              <span className="group-data-[collapsible=icon]:hidden ">
+                {item.title}
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        )
+        );
       })}
     </SidebarMenu>
-  )
+  );
 }

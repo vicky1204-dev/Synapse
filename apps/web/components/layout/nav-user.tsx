@@ -63,11 +63,11 @@ export function NavUser({
               <SidebarMenuButton
                 size="lg"
                 tooltip={user.name}
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground px-1"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground px-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-0!"
               />
             }
           >
-            <Avatar size="lg">
+            <Avatar className="size-8 shrink-0 group-data-[collapsible=icon]:size-7">
               <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
