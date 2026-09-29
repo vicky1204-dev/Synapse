@@ -12,11 +12,15 @@
 import { Router } from "express";
 import { healthRouter } from "../modules/health/health.routes";
 import { authRouter } from "../modules/auth/auth.routes";
+import { subjectRouter } from "../modules/subjects/subject.routes";
+import { usersRouter } from "../modules/users/users.routes";
 
 const v1Router = Router();
 
 v1Router.use("/health", healthRouter);
 v1Router.use("/auth", authRouter);
+v1Router.use("/subjects", subjectRouter);
+v1Router.use("/users", usersRouter);
 
 // Future module routers are mounted here:
 // v1Router.use("/courses", coursesRouter);
