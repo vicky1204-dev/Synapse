@@ -112,7 +112,7 @@ body {
   --destructive: #ff2727;
   --destructive-foreground: #ffffff;
   --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.102);
   --icon: #6d6d6d;
   --ring: #6898ff;
   --chart-1: oklch(0.87 0 0);

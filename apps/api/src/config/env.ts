@@ -28,6 +28,15 @@ const envSchema = z.object({
     .string()
     .default("http://localhost:3000")
     .transform((val) => val.split(",").map((o) => o.trim())),
+
+  /** JWT secret for access tokens. Never log this value. */
+  JWT_ACCESS_SECRET: z.string().min(32, "JWT_ACCESS_SECRET must be at least 32 characters"),
+  /** JWT secret for refresh tokens. Never log this value. */
+  JWT_REFRESH_SECRET: z.string().min(32, "JWT_REFRESH_SECRET must be at least 32 characters"),
+  /** Access token expiration (e.g., "15m", "1h") */
+  JWT_ACCESS_EXPIRY: z.string().default("15m"),
+  /** Refresh token expiration (e.g., "7d", "30d") */
+  JWT_REFRESH_EXPIRY: z.string().default("7d"),
 });
 
 // ---------------------------------------------------------------------------
@@ -37,8 +46,9 @@ const envSchema = z.object({
 const _parsed = envSchema.safeParse(process.env);
 
 if (!_parsed.success) {
+  // eslint-disable-next-line no-console
   console.error(
-    "❌  Invalid environment variables:\n",
+    "Invalid environment variables:\n",
     _parsed.error.flatten().fieldErrors,
   );
   process.exit(1);

@@ -9,6 +9,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
 
+/* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace Express {
     interface Request {
@@ -16,6 +17,7 @@ declare global {
     }
   }
 }
+/* eslint-enable @typescript-eslint/no-namespace */
 
 export function requestId(req: Request, res: Response, next: NextFunction) {
   const id = (req.headers["x-request-id"] as string | undefined) ?? uuidv4();

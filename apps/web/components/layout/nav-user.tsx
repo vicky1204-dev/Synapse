@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import {
   BellIcon,
   ChevronsUpDownIcon,
@@ -12,6 +13,8 @@ import {
   UserIcon,
 } from "lucide-react";
 import { cn } from "cn";
+import { useLogout } from "@/features/auth/mutations";
+import { Spinner } from "@/components/ui/spinner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -40,6 +43,8 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const { resolvedTheme, setTheme } = useTheme();
+  const router = useRouter();
+  const logout = useLogout();
   const mounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -52,6 +57,12 @@ export function NavUser({
   const toggleTheme = (e: React.MouseEvent) => {
     e.preventDefault();
     setTheme(isDark ? "light" : "dark");
+  };
+
+  const handleLogout = () => {
+    logout.mutate(undefined, {
+      onSettled: () => router.replace("/login"),
+    });
   };
 
   return (
@@ -154,8 +165,17 @@ export function NavUser({
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem variant="destructive" className="font-semibold">
-              <LogOutIcon />
+            <DropdownMenuItem
+              variant="destructive"
+              className="font-semibold"
+              onClick={handleLogout}
+              disabled={logout.isPending}
+            >
+              {logout.isPending ? (
+                <Spinner className="size-4" />
+              ) : (
+                <LogOutIcon />
+              )}
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
