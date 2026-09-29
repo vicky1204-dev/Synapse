@@ -6,7 +6,7 @@
  */
 
 import morgan from "morgan";
-import type { Request, Response } from "express";
+import type { Request } from "express";
 import { logger } from "../lib/logger";
 import { env } from "../config/env";
 
