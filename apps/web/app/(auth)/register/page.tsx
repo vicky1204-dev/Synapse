@@ -1,9 +1,11 @@
-import React from 'react'
+import type { Metadata } from "next";
+import { RegisterForm } from "@/features/auth/register-form";
 
-const Register = () => {
-  return (
-    <div>Register</div>
-  )
+export const metadata: Metadata = {
+  title: "Create account",
+  description: "Create your Synapse account and start learning.",
+};
+
+export default function RegisterPage() {
+  return <RegisterForm />;
 }
-
-export default Register

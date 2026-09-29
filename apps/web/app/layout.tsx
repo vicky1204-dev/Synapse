@@ -31,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${manrope.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-secondary">
+      <body className="bg-secondary flex min-h-full flex-col">
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
             {children}

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useAuthStore } from "@/stores/auth.store";
 import {
   BookOpenIcon,
   BookmarkIcon,
@@ -58,18 +59,21 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-// Placeholder — swap with real session data when auth lands.
-const currentUser = {
-  name: "Ashutosh Samal",
-  email: "ashutosh@synapse.app",
-  avatar: "",
-};
-
 // ---------------------------------------------------------------------------
 // AppSidebar
 // ---------------------------------------------------------------------------
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+  const storeUser = useAuthStore((s) => s.user);
+
+  // Fall back to empty strings while session is loading — NavUser renders
+  // the avatar fallback initials rather than crashing.
+  const currentUser = {
+    name: storeUser?.name ?? "",
+    email: storeUser?.email ?? "",
+    avatar: storeUser?.avatarUrl ?? "",
+  };
+
   return (
     <Sidebar
       collapsible="icon"

@@ -7,6 +7,7 @@
 
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { Types } from "mongoose";
 import { env } from "../../config/env";
 import { User } from "./user.model";
 import { RefreshToken } from "./refresh-token.model";
@@ -133,24 +134,23 @@ export async function register(dto: RegisterDto): Promise<AuthResponse> {
   });
 
   // Generate tokens
-  const refreshTokenDoc = await RefreshToken.create({
-    userId: user._id,
-    token: "", // Will be set below
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-  });
-
+  const tokenId = new Types.ObjectId();
   const accessToken = generateAccessToken(
     user._id.toString(),
     user.email
   );
   const refreshToken = generateRefreshToken(
     user._id.toString(),
-    refreshTokenDoc._id.toString()
+    tokenId.toString()
   );
 
   // Store the refresh token
-  refreshTokenDoc.token = refreshToken;
-  await refreshTokenDoc.save();
+  await RefreshToken.create({
+    _id: tokenId,
+    userId: user._id,
+    token: refreshToken,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+  });
 
   return {
     user: mapUserToResponse(user),
@@ -185,24 +185,23 @@ export async function login(dto: LoginDto): Promise<AuthResponse> {
   });
 
   // Generate tokens
-  const refreshTokenDoc = await RefreshToken.create({
-    userId: user._id,
-    token: "", // Will be set below
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-  });
-
+  const tokenId = new Types.ObjectId();
   const accessToken = generateAccessToken(
     user._id.toString(),
     user.email
   );
   const refreshToken = generateRefreshToken(
     user._id.toString(),
-    refreshTokenDoc._id.toString()
+    tokenId.toString()
   );
 
   // Store the refresh token
-  refreshTokenDoc.token = refreshToken;
-  await refreshTokenDoc.save();
+  await RefreshToken.create({
+    _id: tokenId,
+    userId: user._id,
+    token: refreshToken,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+  });
 
   return {
     user: mapUserToResponse(user),
@@ -239,24 +238,23 @@ export async function refresh(token: string): Promise<AuthResponse> {
   // Rotate refresh token (delete old, create new)
   await RefreshToken.deleteOne({ _id: storedToken._id });
 
-  const newRefreshTokenDoc = await RefreshToken.create({
-    userId: user._id,
-    token: "", // Will be set below
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-  });
-
+  const tokenId = new Types.ObjectId();
   const newAccessToken = generateAccessToken(
     user._id.toString(),
     user.email
   );
   const newRefreshToken = generateRefreshToken(
     user._id.toString(),
-    newRefreshTokenDoc._id.toString()
+    tokenId.toString()
   );
 
   // Store the new refresh token
-  newRefreshTokenDoc.token = newRefreshToken;
-  await newRefreshTokenDoc.save();
+  await RefreshToken.create({
+    _id: tokenId,
+    userId: user._id,
+    token: newRefreshToken,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+  });
 
   logger.info({
     message: "Token refreshed",
