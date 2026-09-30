@@ -104,6 +104,29 @@ export async function updateProfile(
     };
   }
 
+  if (dto.onboardingGoals !== undefined) {
+    user.onboardingGoals = dto.onboardingGoals;
+  }
+
+  if (dto.subjectIds && dto.subjectIds.length > 0) {
+    const objectIds = dto.subjectIds.map((id) => new Types.ObjectId(id));
+    const count = await Subject.countDocuments({
+      _id: { $in: objectIds },
+      active: true,
+    });
+
+    if (count !== dto.subjectIds.length) {
+      throw new BadRequestError(
+        "One or more selected subjects do not exist or are inactive",
+        "INVALID_SUBJECT",
+      );
+    }
+
+    user.subjectIds = objectIds;
+  } else if (dto.subjectIds !== undefined) {
+    user.subjectIds = [];
+  }
+
   if (dto.preferences) {
     user.preferences = {
       ...user.preferences,

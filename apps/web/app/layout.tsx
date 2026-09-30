@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { QueryProvider } from "@/providers/query-provider";
 
+import { Toaster } from "@/components/ui/toast";
+
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
@@ -35,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
             {children}
+            <Toaster />
           </ThemeProvider>
         </QueryProvider>
       </body>

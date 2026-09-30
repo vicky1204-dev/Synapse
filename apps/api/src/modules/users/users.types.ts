@@ -21,6 +21,8 @@ export interface UpdateProfileDto {
   name?: string;
   avatarUrl?: string;
   academicProfile?: AcademicProfileDto;
+  onboardingGoals?: string[];
+  subjectIds?: string[];
   preferences?: {
     theme?: "light" | "dark" | "system";
   };

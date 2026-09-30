@@ -11,9 +11,9 @@ export const academicProfileSchema = z.object({
   program: z
     .string()
     .trim()
-    .min(1, "Program cannot be empty")
     .max(100, "Program name is too long")
-    .optional(),
+    .optional()
+    .or(z.literal("")),
   year: z
     .number()
     .int("Year must be an integer")
@@ -24,7 +24,8 @@ export const academicProfileSchema = z.object({
     .string()
     .trim()
     .max(150, "Institution name is too long")
-    .optional(),
+    .optional()
+    .or(z.literal("")),
 });
 
 export const updateOnboardingSchema = z.object({
@@ -60,6 +61,20 @@ export const updateProfileSchema = z.object({
     .optional()
     .or(z.literal("")),
   academicProfile: academicProfileSchema.optional(),
+  onboardingGoals: z
+    .array(
+      z
+        .string()
+        .trim()
+        .min(1, "Goal cannot be empty")
+        .max(100, "Goal is too long"),
+    )
+    .max(10, "Cannot specify more than 10 goals")
+    .optional(),
+  subjectIds: z
+    .array(z.string().regex(objectIdRegex, "Invalid subject ID format"))
+    .max(10, "Cannot select more than 10 subjects")
+    .optional(),
   preferences: z
     .object({
       theme: z.enum(["light", "dark", "system"]).optional(),
