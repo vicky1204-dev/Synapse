@@ -15,16 +15,20 @@ import { authRouter } from "../modules/auth/auth.routes";
 import { subjectRouter } from "../modules/subjects/subject.routes";
 import { usersRouter } from "../modules/users/users.routes";
 
+import { resourceRouter } from "../modules/resources/resource.routes";
+import { savedRouter } from "../modules/resources/saved.routes";
+
 const v1Router = Router();
 
 v1Router.use("/health", healthRouter);
 v1Router.use("/auth", authRouter);
 v1Router.use("/subjects", subjectRouter);
 v1Router.use("/users", usersRouter);
+v1Router.use("/resources", resourceRouter);
+v1Router.use("/saved", savedRouter);
 
 // Future module routers are mounted here:
 // v1Router.use("/courses", coursesRouter);
-// v1Router.use("/resources", resourcesRouter);
 // v1Router.use("/discussions", discussionsRouter);
 // v1Router.use("/study", studyRouter);
 
