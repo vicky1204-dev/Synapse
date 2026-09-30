@@ -35,6 +35,7 @@ export function mapResourceToResponse(
   options?: {
     isSaved?: boolean;
     coursesCount?: number;
+    savesCount?: number;
   },
 ): ResourceResponse {
   let uploader: { id: string; name: string; avatarUrl?: string } | undefined;
@@ -74,6 +75,7 @@ export function mapResourceToResponse(
     visibility: doc.visibility,
     isSaved: options?.isSaved,
     coursesCount: options?.coursesCount,
+    savesCount: options?.savesCount ?? 0,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };
@@ -167,20 +169,39 @@ export async function getResources(
       .limit(limit),
   ]);
 
-  // Check saved state for current user
+  // Check saved state for current user & compute total saves count per resource
   let savedSet = new Set<string>();
-  if (currentUserId && docs.length > 0) {
-    const savedDocs = await SavedResource.find({
-      userId: new Types.ObjectId(currentUserId),
-      resourceId: { $in: docs.map((d) => d._id) },
-    }).select("resourceId");
+  let savesCountMap = new Map<string, number>();
+
+  if (docs.length > 0) {
+    const docIds = docs.map((d) => d._id);
+    const [savedDocs, savesAggregation] = await Promise.all([
+      currentUserId
+        ? SavedResource.find({
+            userId: new Types.ObjectId(currentUserId),
+            resourceId: { $in: docIds },
+          }).select("resourceId")
+        : Promise.resolve([]),
+      SavedResource.aggregate([
+        { $match: { resourceId: { $in: docIds } } },
+        { $group: { _id: "$resourceId", count: { $sum: 1 } } },
+      ]),
+    ]);
+
     savedSet = new Set(savedDocs.map((s) => s.resourceId.toString()));
+    savesCountMap = new Map(
+      savesAggregation.map((s) => [s._id.toString(), s.count as number]),
+    );
   }
 
   const data = docs.map((doc) =>
-    mapResourceToResponse(doc as unknown as IResource & { uploaderId: Types.ObjectId }, {
-      isSaved: savedSet.has(doc._id.toString()),
-    }),
+    mapResourceToResponse(
+      doc as unknown as IResource & { uploaderId: Types.ObjectId },
+      {
+        isSaved: savedSet.has(doc._id.toString()),
+        savesCount: savesCountMap.get(doc._id.toString()) ?? 0,
+      },
+    ),
   );
 
   return {
@@ -235,13 +256,18 @@ export async function getResourceById(
     isSaved = Boolean(savedDoc);
   }
 
-  const coursesCount = await CourseResource.countDocuments({
-    resourceId: resource._id,
-  });
+  const [coursesCount, savesCount] = await Promise.all([
+    CourseResource.countDocuments({
+      resourceId: resource._id,
+    }),
+    SavedResource.countDocuments({
+      resourceId: resource._id,
+    }),
+  ]);
 
   return mapResourceToResponse(
     resource as unknown as IResource & { uploaderId: Types.ObjectId },
-    { isSaved, coursesCount },
+    { isSaved, coursesCount, savesCount },
   );
 }
 
@@ -276,8 +302,8 @@ export async function createResource(
     visibility: dto.visibility ?? "public",
   });
 
-  // If a course context is provided, immediately create the CourseResource association
-  if (dto.courseId) {
+  // If a valid course ID is provided, create the CourseResource association
+  if (dto.courseId && Types.ObjectId.isValid(dto.courseId)) {
     const courseObjectId = new Types.ObjectId(dto.courseId);
     const course = await Course.findById(courseObjectId);
     if (course) {

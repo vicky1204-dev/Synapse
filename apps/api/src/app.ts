@@ -9,6 +9,7 @@
  */
 
 import express from "express";
+import path from "path";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -45,6 +46,9 @@ export function createApp() {
 
   // Parse cookies for authentication tokens.
   app.use(cookieParser());
+
+  // Serve uploaded files statically
+  app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 
   app.use("/api/v1", v1Router);
 

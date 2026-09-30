@@ -21,7 +21,7 @@ export const createResourceSchema = z
       .optional(),
     type: z.enum(RESOURCE_TYPES, {
       errorMap: () => ({
-        message: "Invalid resource type. Supported types: pdf, video, audio, link, note",
+        message: "Invalid resource type. Supported types: pdf, ppt, doc, link, note",
       }),
     }),
     file: z
@@ -35,10 +35,7 @@ export const createResourceSchema = z
       })
       .optional(),
     visibility: z.enum(RESOURCE_VISIBILITIES).default("public"),
-    courseId: z
-      .string()
-      .regex(objectIdRegex, "Invalid course ID format")
-      .optional(),
+    courseId: z.string().trim().optional(),
     aiMetadata: z
       .object({
         summary: z.string().trim().max(1000).optional(),
@@ -60,6 +57,22 @@ export const createResourceSchema = z
       path: ["file", "url"],
     },
   );
+
+export const uploadResourceBodySchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .max(200, "Title cannot exceed 200 characters")
+    .optional(),
+  description: z
+    .string()
+    .trim()
+    .max(2000, "Description cannot exceed 2000 characters")
+    .optional(),
+  type: z.enum(RESOURCE_TYPES).optional(),
+  visibility: z.enum(RESOURCE_VISIBILITIES).default("public"),
+  courseId: z.string().trim().optional(),
+});
 
 export const updateResourceSchema = z.object({
   title: z

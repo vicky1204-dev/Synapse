@@ -4,7 +4,13 @@
 
 import type { Document, Types } from "mongoose";
 
-export const RESOURCE_TYPES = ["pdf", "video", "audio", "link", "note"] as const;
+export const RESOURCE_TYPES = [
+  "pdf",
+  "word",
+  "ppt",
+  "note",
+  "link",
+] as const;
 export type ResourceType = (typeof RESOURCE_TYPES)[number];
 
 export const PROCESSING_STATUSES = [
@@ -145,6 +151,7 @@ export interface ResourceResponse {
   visibility: ResourceVisibility;
   isSaved?: boolean;
   coursesCount?: number;
+  savesCount?: number;
   createdAt: string;
   updatedAt: string;
 }

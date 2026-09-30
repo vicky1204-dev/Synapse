@@ -9,9 +9,22 @@
 // Response envelopes
 // ---------------------------------------------------------------------------
 
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  hasNextPage: boolean;
+}
+
 export interface ApiSuccessResponse<T> {
   success: true;
   data: T;
+}
+
+export interface ApiPaginatedResponse<T> {
+  success: true;
+  data: T[];
+  pagination: Pagination;
 }
 
 export interface ApiErrorResponse {

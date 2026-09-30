@@ -12,12 +12,19 @@ import {
 } from "../../middleware/authenticate";
 import * as resourceController from "./resource.controller";
 
+import { upload } from "../../middleware/upload";
+
 const router = Router();
 
 // Resource browse, search, and detail
 router.get("/", optionalAuthenticate, resourceController.listResources);
 router.post("/", authenticate, resourceController.createResource);
-router.post("/upload", authenticate, resourceController.createResource);
+router.post(
+  "/upload",
+  authenticate,
+  upload.single("file"),
+  resourceController.uploadResource,
+);
 
 router.get("/:resourceId", optionalAuthenticate, resourceController.getResource);
 router.patch("/:resourceId", authenticate, resourceController.updateResource);

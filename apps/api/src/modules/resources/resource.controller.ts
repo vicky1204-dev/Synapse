@@ -9,11 +9,15 @@ import { sendSuccess, sendPaginated } from "../../utils/response";
 import { BadRequestError } from "../../middleware/error-handler";
 import {
   createResourceSchema,
+  uploadResourceBodySchema,
   updateResourceSchema,
   queryResourcesSchema,
   associateCourseResourceSchema,
 } from "./resource.validation";
 import * as resourceService from "./resource.service";
+
+import { uploadFileToStorage } from "../../services/storage.service";
+import path from "path";
 
 function getParam(param: string | string[] | undefined): string {
   if (Array.isArray(param)) return param[0] ?? "";
@@ -79,6 +83,75 @@ export async function createResource(
     const resource = await resourceService.createResource(
       req.user!.userId,
       parsed.data,
+    );
+
+    sendSuccess(res, { resource }, 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function uploadResource(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    if (!req.file) {
+      throw new BadRequestError(
+        "No file uploaded. Please attach a file.",
+        "NO_FILE_UPLOADED",
+      );
+    }
+
+    const parsed = uploadResourceBodySchema.safeParse(req.body);
+    if (!parsed.success) {
+      throw new BadRequestError(
+        parsed.error.errors[0]?.message || "Invalid upload parameters",
+        "VALIDATION_ERROR",
+      );
+    }
+
+    const title =
+      parsed.data.title ||
+      req.file.originalname.replace(/\.[^/.]+$/, "");
+
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    let detectedType = parsed.data.type;
+    if (!detectedType) {
+      if (req.file.mimetype === "application/pdf" || ext === ".pdf") {
+        detectedType = "pdf";
+      } else if (
+        ext === ".doc" ||
+        ext === ".docx" ||
+        req.file.mimetype.includes("word")
+      ) {
+        detectedType = "word";
+      } else if (
+        ext === ".ppt" ||
+        ext === ".pptx" ||
+        req.file.mimetype.includes("powerpoint") ||
+        req.file.mimetype.includes("presentation")
+      ) {
+        detectedType = "ppt";
+      } else {
+        detectedType = "note";
+      }
+    }
+
+    // Upload to Cloudinary (or local fallback)
+    const storedFile = await uploadFileToStorage(req.file);
+
+    const resource = await resourceService.createResource(
+      req.user!.userId,
+      {
+        title,
+        description: parsed.data.description,
+        type: detectedType,
+        visibility: parsed.data.visibility,
+        courseId: parsed.data.courseId,
+        file: storedFile,
+      },
     );
 
     sendSuccess(res, { resource }, 201);
