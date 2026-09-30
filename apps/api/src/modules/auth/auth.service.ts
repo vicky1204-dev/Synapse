@@ -9,7 +9,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 import { env } from "../../config/env";
-import { User } from "./user.model";
+import { User } from "../users/user.model";
 import { RefreshToken } from "./refresh-token.model";
 import type {
   RegisterDto,
@@ -36,7 +36,7 @@ async function hashPassword(password: string): Promise<string> {
 
 async function verifyPassword(
   password: string,
-  hash: string
+  hash: string,
 ): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
@@ -73,7 +73,10 @@ export function verifyAccessToken(token: string): AccessTokenPayload {
   try {
     return jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenPayload;
   } catch {
-    throw new UnauthorizedError("Invalid or expired access token", "TOKEN_INVALID");
+    throw new UnauthorizedError(
+      "Invalid or expired access token",
+      "TOKEN_INVALID",
+    );
   }
 }
 
@@ -81,7 +84,10 @@ function verifyRefreshToken(token: string): RefreshTokenPayload {
   try {
     return jwt.verify(token, env.JWT_REFRESH_SECRET) as RefreshTokenPayload;
   } catch {
-    throw new UnauthorizedError("Invalid or expired refresh token", "TOKEN_INVALID");
+    throw new UnauthorizedError(
+      "Invalid or expired refresh token",
+      "TOKEN_INVALID",
+    );
   }
 }
 
@@ -89,7 +95,7 @@ function verifyRefreshToken(token: string): RefreshTokenPayload {
 // User mapping
 // ---------------------------------------------------------------------------
 
-function mapUserToResponse(user: IUser): UserResponse {
+export function mapUserToResponse(user: IUser): UserResponse {
   return {
     id: user._id.toString(),
     email: user.email,
@@ -97,6 +103,9 @@ function mapUserToResponse(user: IUser): UserResponse {
     avatarUrl: user.avatarUrl,
     onboardingStatus: user.onboardingStatus,
     academicProfile: user.academicProfile,
+    onboardingGoals: user.onboardingGoals ?? [],
+    subjectIds: (user.subjectIds ?? []).map((id) => id.toString()),
+    preferences: user.preferences ?? {},
     createdAt: user.createdAt.toISOString(),
   };
 }
@@ -109,10 +118,7 @@ export async function register(dto: RegisterDto): Promise<AuthResponse> {
   // Check if user already exists
   const existingUser = await User.findOne({ email: dto.email });
   if (existingUser) {
-    throw new ConflictError(
-      "Email already registered",
-      "EMAIL_ALREADY_EXISTS"
-    );
+    throw new ConflictError("Email already registered", "EMAIL_ALREADY_EXISTS");
   }
 
   // Hash password
@@ -135,13 +141,10 @@ export async function register(dto: RegisterDto): Promise<AuthResponse> {
 
   // Generate tokens
   const tokenId = new Types.ObjectId();
-  const accessToken = generateAccessToken(
-    user._id.toString(),
-    user.email
-  );
+  const accessToken = generateAccessToken(user._id.toString(), user.email);
   const refreshToken = generateRefreshToken(
     user._id.toString(),
-    tokenId.toString()
+    tokenId.toString(),
   );
 
   // Store the refresh token
@@ -165,7 +168,7 @@ export async function login(dto: LoginDto): Promise<AuthResponse> {
   if (!user) {
     throw new UnauthorizedError(
       "Invalid email or password",
-      "INVALID_CREDENTIALS"
+      "INVALID_CREDENTIALS",
     );
   }
 
@@ -174,7 +177,7 @@ export async function login(dto: LoginDto): Promise<AuthResponse> {
   if (!isValidPassword) {
     throw new UnauthorizedError(
       "Invalid email or password",
-      "INVALID_CREDENTIALS"
+      "INVALID_CREDENTIALS",
     );
   }
 
@@ -186,13 +189,10 @@ export async function login(dto: LoginDto): Promise<AuthResponse> {
 
   // Generate tokens
   const tokenId = new Types.ObjectId();
-  const accessToken = generateAccessToken(
-    user._id.toString(),
-    user.email
-  );
+  const accessToken = generateAccessToken(user._id.toString(), user.email);
   const refreshToken = generateRefreshToken(
     user._id.toString(),
-    tokenId.toString()
+    tokenId.toString(),
   );
 
   // Store the refresh token
@@ -239,13 +239,10 @@ export async function refresh(token: string): Promise<AuthResponse> {
   await RefreshToken.deleteOne({ _id: storedToken._id });
 
   const tokenId = new Types.ObjectId();
-  const newAccessToken = generateAccessToken(
-    user._id.toString(),
-    user.email
-  );
+  const newAccessToken = generateAccessToken(user._id.toString(), user.email);
   const newRefreshToken = generateRefreshToken(
     user._id.toString(),
-    tokenId.toString()
+    tokenId.toString(),
   );
 
   // Store the new refresh token
@@ -283,7 +280,9 @@ export async function logout(refreshToken: string): Promise<void> {
   });
 }
 
-export async function getAuthenticatedUser(userId: string): Promise<UserResponse> {
+export async function getAuthenticatedUser(
+  userId: string,
+): Promise<UserResponse> {
   const user = await User.findById(userId);
   if (!user) {
     throw new UnauthorizedError("User not found", "USER_NOT_FOUND");

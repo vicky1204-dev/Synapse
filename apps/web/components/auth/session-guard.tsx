@@ -22,68 +22,94 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/stores/auth.store";
-import { ApiError } from "@/lib/api/types";
+import { useAuthStore, type SessionUser } from "@/stores/auth.store";
 import ky from "ky";
 
 type SessionState = "loading" | "authenticated" | "unauthenticated";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
-export function SessionGuard({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [sessionState, setSessionState] = useState<SessionState>("loading");
-  const setSession = useAuthStore((s) => s.setSession);
+let inFlightSessionPromise: Promise<{
+  accessToken: string;
+  user: SessionUser;
+} | null> | null = null;
 
-  useEffect(() => {
-    let cancelled = false;
+async function checkSession(): Promise<{
+  accessToken: string;
+  user: SessionUser;
+} | null> {
+  if (inFlightSessionPromise) return inFlightSessionPromise;
 
-    async function initSession() {
-      try {
-        // Attempt silent refresh using the HTTP-only cookie.
-        const res = await ky
-          .post(`${API_BASE_URL}/api/v1/auth/refresh`, {
-            credentials: "include",
-          })
-          .json<{ success: true; data: { user: { id: string; email: string; name: string; avatarUrl?: string; onboardingStatus: "pending" | "completed" }; accessToken: string } }>();
+  inFlightSessionPromise = (async () => {
+    try {
+      const res = await ky
+        .post(`${API_BASE_URL}/api/v1/auth/refresh`, {
+          credentials: "include",
+        })
+        .json<{
+          success: true;
+          data: {
+            user: SessionUser;
+            accessToken: string;
+          };
+        }>();
 
-        if (cancelled) return;
-
-        setSession(res.data.accessToken, {
+      return {
+        accessToken: res.data.accessToken,
+        user: {
           id: res.data.user.id,
           email: res.data.user.email,
           name: res.data.user.name,
           avatarUrl: res.data.user.avatarUrl,
           onboardingStatus: res.data.user.onboardingStatus,
-        });
+        },
+      };
+    } catch {
+      return null;
+    } finally {
+      inFlightSessionPromise = null;
+    }
+  })();
 
-        setSessionState("authenticated");
-      } catch (err) {
-        if (cancelled) return;
+  return inFlightSessionPromise;
+}
 
-        // Any failure (401, network error, etc.) → redirect to login.
-        const isAuthError =
-          err instanceof ApiError
-            ? err.status === 401
-            : true;
+export function SessionGuard({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const storeAccessToken = useAuthStore((s) => s.accessToken);
+  const storeUser = useAuthStore((s) => s.user);
+  const isAlreadyAuthed = Boolean(storeAccessToken && storeUser);
 
-        if (isAuthError) {
-          setSessionState("unauthenticated");
-          router.replace("/login");
-        } else {
-          // Non-auth error (network outage, etc.) — surface loading state
-          // so the user can retry.  In production you'd show an error UI.
-          setSessionState("loading");
-        }
-      }
+  const [sessionState, setSessionState] = useState<SessionState>(
+    isAlreadyAuthed ? "authenticated" : "loading",
+  );
+  const setSession = useAuthStore((s) => s.setSession);
+
+  useEffect(() => {
+    // If the session is already established in memory (e.g. after login/register),
+    // skip silent refresh entirely.
+    if (isAlreadyAuthed) {
+      return;
     }
 
-    initSession();
+    let isMounted = true;
+
+    checkSession().then((session) => {
+      if (!isMounted) return;
+
+      if (session) {
+        setSession(session.accessToken, session.user);
+        setSessionState("authenticated");
+      } else {
+        setSessionState("unauthenticated");
+        router.replace("/login");
+      }
+    });
+
     return () => {
-      cancelled = true;
+      isMounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAlreadyAuthed, router, setSession]);
 
   if (sessionState === "loading") {
     return (

@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
+import { OnboardingFlow } from "@/features/onboarding";
 
 export const metadata: Metadata = {
-  title: "Onboarding",
-  description: "Complete your Synapse profile setup.",
+  title: "Onboarding — Synapse",
+  description: "Complete your Synapse profile and academic setup.",
 };
 
 export default function OnboardingPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <div className="text-center">
-        <h1 className="font-display text-2xl font-semibold">Welcome to Synapse</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Setting up your workspace…
-        </p>
-      </div>
-    </div>
+    <main className="flex min-h-screen w-full items-center justify-center bg-[radial-gradient(circle,#b0a8b8_1px,transparent_1px)] bg-size-[10px_10px] p-4 sm:p-6 dark:bg-[radial-gradient(circle,#ffffff1a_1px,transparent_1px)]">
+      <OnboardingFlow />
+    </main>
   );
 }

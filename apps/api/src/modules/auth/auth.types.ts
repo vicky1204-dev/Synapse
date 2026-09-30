@@ -80,5 +80,10 @@ export interface UserResponse {
     year?: number;
     institution?: string;
   };
+  onboardingGoals: string[];
+  subjectIds: string[];
+  preferences: {
+    theme?: "light" | "dark" | "system";
+  };
   createdAt: string;
 }
