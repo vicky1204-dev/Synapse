@@ -9,6 +9,7 @@
  */
 
 import express from "express";
+import path from "path";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -22,8 +23,14 @@ import { v1Router } from "./routes/v1";
 export function createApp() {
   const app = express();
 
-  // Set security-related HTTP headers.
-  app.use(helmet());
+  // Set security-related HTTP headers. Allow cross-origin resources and embedding for previews.
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+      contentSecurityPolicy: false,
+      frameguard: false,
+    }),
+  );
 
   // CORS — allow only configured origins.
   app.use(
@@ -45,6 +52,28 @@ export function createApp() {
 
   // Parse cookies for authentication tokens.
   app.use(cookieParser());
+
+  // Serve uploaded files statically with permissive headers for browser embedding
+  app.use(
+    "/uploads",
+    (req, res, next) => {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+      res.removeHeader("X-Frame-Options");
+      if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+      }
+      next();
+    },
+    express.static(path.resolve(process.cwd(), "uploads"), {
+      setHeaders: (res) => {
+        res.setHeader("Content-Disposition", "inline");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+      },
+    }),
+  );
 
   app.use("/api/v1", v1Router);
 

@@ -37,6 +37,11 @@ const envSchema = z.object({
   JWT_ACCESS_EXPIRY: z.string().default("15m"),
   /** Refresh token expiration (e.g., "7d", "30d") */
   JWT_REFRESH_EXPIRY: z.string().default("7d"),
+
+  /** Cloudinary Storage (optional, falls back to local uploads if omitted) */
+  CLOUDINARY_CLOUD_NAME: z.string().optional(),
+  CLOUDINARY_API_KEY: z.string().optional(),
+  CLOUDINARY_API_SECRET: z.string().optional(),
 });
 
 // ---------------------------------------------------------------------------
