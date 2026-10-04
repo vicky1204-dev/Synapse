@@ -14,4 +14,8 @@ export { FileDropzone } from "./components/file-dropzone";
 export { LibraryView } from "./components/library-view";
 export { ResourceCard } from "./components/resource-card";
 export { ResourceFilters } from "./components/resource-filters";
+export { ResourceViewer } from "./components/resource-viewer";
+export { ResourceDetailView } from "./components/resource-detail-view";
+export * from "./utils";
+
 

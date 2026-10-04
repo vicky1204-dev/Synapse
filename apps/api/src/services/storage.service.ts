@@ -42,9 +42,16 @@ export async function uploadFileToStorage(
 ): Promise<StoredFileResult> {
   if (hasCloudinary && file.path) {
     try {
+      const isRawDocument =
+        file.mimetype.includes("word") ||
+        file.mimetype.includes("presentation") ||
+        file.mimetype.includes("officedocument") ||
+        Boolean(file.originalname.match(/\.(docx?|pptx?)$/i));
+
       const uploadResult = await cloudinary.uploader.upload(file.path, {
         folder: "synapse/resources",
-        resource_type: "auto",
+        resource_type: isRawDocument ? "raw" : "auto",
+        access_mode: "public",
         use_filename: true,
         unique_filename: true,
       });

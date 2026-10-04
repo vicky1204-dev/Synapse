@@ -10,6 +10,7 @@ import {
   uploadResourceFile,
   saveResource,
   unsaveResource,
+  deleteResource,
 } from "./api";
 import { resourceKeys } from "./keys";
 import { toast } from "@/components/ui/toast";
@@ -106,3 +107,27 @@ export function useUnsaveResource() {
     },
   });
 }
+
+export function useDeleteResource() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteResource(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: resourceKeys.all });
+      toast.add({
+        title: "Resource deleted",
+        description: "The resource has been deleted.",
+        type: "success",
+      });
+    },
+    onError: (err: Error) => {
+      toast.add({
+        title: "Delete failed",
+        description: err.message || "Failed to delete resource.",
+        type: "error",
+      });
+    },
+  });
+}
+

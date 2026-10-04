@@ -95,3 +95,9 @@ export async function unsaveResource(
 
   return res.data;
 }
+
+export async function deleteResource(id: string): Promise<void> {
+  await apiClient
+    .delete(`api/v1/resources/${id}`)
+    .json<ApiSuccessResponse<null>>();
+}
