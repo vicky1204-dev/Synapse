@@ -43,7 +43,7 @@ export const courseFormSchema = z.object({
     .trim()
     .max(50, "Semester cannot exceed 50 characters")
     .optional(),
-  year: z.coerce
+  year: z
     .number()
     .int()
     .min(1900, "Year must be 1900 or later")
@@ -52,9 +52,8 @@ export const courseFormSchema = z.object({
   color: z
     .string()
     .trim()
-    .regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, "Valid hex color required")
-    .default("#3072FF"),
-  status: z.enum(["active", "archived"]).default("active"),
+    .regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, "Valid hex color required"),
+  status: z.enum(["active", "archived"]),
 });
 
 export type CourseFormValues = z.infer<typeof courseFormSchema>;
