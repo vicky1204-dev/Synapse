@@ -54,15 +54,17 @@ const server = http.createServer(app);
 function shutdown(signal: string) {
   logger.info({ message: `Received ${signal}. Shutting down gracefully.` });
 
-  server.close(async (err) => {
-    if (err) {
-      logger.error({ message: "Error during shutdown", error: err.message });
-      process.exit(1);
-    }
+  server.close((err) => {
+    void (async () => {
+      if (err) {
+        logger.error({ message: "Error during shutdown", error: err.message });
+        process.exit(1);
+      }
 
-    await disconnectDB();
-    logger.info({ message: "Server closed. Exiting." });
-    process.exit(0);
+      await disconnectDB();
+      logger.info({ message: "Server closed. Exiting." });
+      process.exit(0);
+    })();
   });
 
   // Force exit if graceful shutdown takes longer than 10 seconds.

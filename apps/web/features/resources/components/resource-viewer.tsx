@@ -31,8 +31,6 @@ function MarkdownContent({ url, title }: { url: string; title: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    setContent(null);
-    setError(false);
 
     fetch(resolvedUrl)
       .then((res) => {

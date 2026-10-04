@@ -97,5 +97,6 @@ const courseSchema = new Schema<ICourse>(
 // Compound indexes
 courseSchema.index({ ownerId: 1, status: 1 });
 courseSchema.index({ ownerId: 1, subjectId: 1 });
+courseSchema.index({ ownerId: 1, createdAt: -1 });
 
 export const Course = model<ICourse>("Course", courseSchema);
