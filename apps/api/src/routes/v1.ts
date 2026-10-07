@@ -19,6 +19,11 @@ import { resourceRouter } from "../modules/resources/resource.routes";
 import { savedRouter } from "../modules/resources/saved.routes";
 import { courseRouter } from "../modules/courses/course.routes";
 
+import {
+  discussionRouter,
+  commentRouter,
+} from "../modules/discussions/discussion.routes";
+
 const v1Router = Router();
 
 v1Router.use("/health", healthRouter);
@@ -28,9 +33,10 @@ v1Router.use("/users", usersRouter);
 v1Router.use("/resources", resourceRouter);
 v1Router.use("/saved", savedRouter);
 v1Router.use("/courses", courseRouter);
+v1Router.use("/discussions", discussionRouter);
+v1Router.use("/comments", commentRouter);
 
 // Future module routers are mounted here:
-// v1Router.use("/discussions", discussionsRouter);
 // v1Router.use("/study", studyRouter);
 
 export { v1Router };

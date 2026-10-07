@@ -7,6 +7,7 @@
 import { Router } from "express";
 import { authenticate } from "../../middleware/authenticate";
 import * as courseController from "./course.controller";
+import * as discussionController from "../discussions/discussion.controller";
 
 const courseRouter = Router();
 
@@ -24,5 +25,6 @@ courseRouter.delete(
   "/:courseId/resources/:resourceId",
   courseController.disassociateResource,
 );
+courseRouter.get("/:courseId/discussions", discussionController.getCourseDiscussions);
 
 export { courseRouter };
