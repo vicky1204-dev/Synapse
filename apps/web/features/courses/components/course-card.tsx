@@ -90,10 +90,11 @@ export function CourseCard({ course, onEdit }: CourseCardProps) {
                   <span>{course.resourcesCount}</span>
                 </div>
                 <div
-                  className="flex items-center gap-1 text-[11px] font-medium opacity-70"
-                  title="Study pack"
+                  className="flex items-center gap-1 text-[11px] font-medium opacity-80"
+                  title={`${course.studyPacksCount ?? 0} study packs`}
                 >
                   <FolderIcon className="size-3.5" />
+                  <span>{course.studyPacksCount ?? 0}</span>
                 </div>
               </div>
 

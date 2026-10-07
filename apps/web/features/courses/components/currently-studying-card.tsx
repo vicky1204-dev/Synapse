@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { CourseFolderGraphic } from "./course-folder-graphic";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -67,15 +68,71 @@ export function CurrentlyStudyingCard({
     deleteMutation.mutate(course.id);
   };
 
-  // Derive concept/resource counts and progress for display
+  // Derive concept/resource counts and progress for display from real database values
   const resourcesCount = course.resourcesCount ?? 0;
-  const studyPacksCount = Math.max(1, Math.ceil(resourcesCount / 3));
-  // Progress can be computed or have a sensible starting metric based on activity
-  const progressPercent = Math.min(100, Math.max(25, resourcesCount * 12));
-  const completedConcepts = Math.min(
-    18,
-    Math.max(4, Math.round((progressPercent / 100) * 18)),
-  );
+  const studyPacksCount = course.studyPacksCount ?? 0;
+  const progressPercent =
+    course.progress !== undefined && course.progress !== null
+      ? course.progress
+      : resourcesCount > 0
+        ? Math.min(100, resourcesCount * 20)
+        : 0;
+
+  const totalConcepts = Math.max(1, resourcesCount * 3);
+  const completedConcepts = Math.round((progressPercent / 100) * totalConcepts);
+
+  const deadlineInfo = React.useMemo(() => {
+    if (!course.deadline) {
+      return { label: "No deadline", isUrgent: false };
+    }
+    const deadlineDate = new Date(course.deadline);
+    if (isNaN(deadlineDate.getTime())) {
+      return { label: "No deadline", isUrgent: false };
+    }
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(
+      deadlineDate.getFullYear(),
+      deadlineDate.getMonth(),
+      deadlineDate.getDate(),
+    );
+    const diffDays = Math.ceil(
+      (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sept",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const formattedDate = `${deadlineDate.getDate()} ${monthNames[deadlineDate.getMonth()]}`;
+
+    if (diffDays === 0) {
+      return { label: `Exam today (${formattedDate})`, isUrgent: true };
+    } else if (diffDays === 1) {
+      return { label: `Exam tomorrow · 1 day left`, isUrgent: true };
+    } else if (diffDays > 1) {
+      return {
+        label: `Exam on ${formattedDate} · ${diffDays} days left`,
+        isUrgent: diffDays <= 7,
+      };
+    } else {
+      return {
+        label: `Exam passed (${formattedDate})`,
+        isUrgent: false,
+      };
+    }
+  }, [course.deadline]);
 
   return (
     <>
@@ -130,7 +187,7 @@ export function CurrentlyStudyingCard({
             {/* Concepts count subtitle */}
             <div className="flex justify-end">
               <span className="text-xs font-medium text-muted-foreground">
-                {completedConcepts}/18 Concepts
+                {completedConcepts}/{totalConcepts} Concepts
               </span>
             </div>
           </div>
@@ -148,11 +205,18 @@ export function CurrentlyStudyingCard({
                 <span>{studyPacksCount} Study Packs</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <ClockIcon className="size-4 opacity-75" />
-                <span>
-                  {course.semester
-                    ? `${course.semester}${course.year ? ` · ${course.year}` : ""}`
-                    : "In Progress"}
+                <ClockIcon
+                  className={cn(
+                    "size-4 opacity-75",
+                    deadlineInfo.isUrgent && "text-destructive opacity-100",
+                  )}
+                />
+                <span
+                  className={cn(
+                    deadlineInfo.isUrgent && "text-destructive font-semibold",
+                  )}
+                >
+                  {deadlineInfo.label}
                 </span>
               </div>
             </div>

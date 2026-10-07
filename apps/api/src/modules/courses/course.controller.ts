@@ -12,6 +12,8 @@ import {
   updateCourseSchema,
   queryCoursesSchema,
   courseParamsSchema,
+  courseResourceParamsSchema,
+  associateCourseResourceSchema,
   courseResourcesQuerySchema,
 } from "./course.validation";
 import * as courseService from "./course.service";
@@ -216,6 +218,82 @@ export async function getCourseResources(
     );
 
     sendPaginated(res, data, pagination);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function associateResource(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const params = courseParamsSchema.safeParse({
+      courseId: getParam(req.params.courseId),
+    });
+    if (!params.success) {
+      throw new BadRequestError(
+        params.error.errors[0]?.message || "Invalid course ID format",
+        "VALIDATION_ERROR",
+      );
+    }
+
+    const body = associateCourseResourceSchema.safeParse(req.body);
+    if (!body.success) {
+      throw new BadRequestError(
+        body.error.errors[0]?.message || "Invalid resource payload",
+        "VALIDATION_ERROR",
+      );
+    }
+
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestError("Unauthorized", "UNAUTHORIZED");
+    }
+
+    await courseService.associateResourceToCourse(
+      params.data.courseId,
+      body.data.resourceId,
+      userId,
+      body.data.position,
+    );
+
+    sendSuccess(res, { associated: true });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function disassociateResource(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const params = courseResourceParamsSchema.safeParse({
+      courseId: getParam(req.params.courseId),
+      resourceId: getParam(req.params.resourceId),
+    });
+    if (!params.success) {
+      throw new BadRequestError(
+        params.error.errors[0]?.message || "Invalid course or resource ID format",
+        "VALIDATION_ERROR",
+      );
+    }
+
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new BadRequestError("Unauthorized", "UNAUTHORIZED");
+    }
+
+    await courseService.disassociateResourceFromCourse(
+      params.data.courseId,
+      params.data.resourceId,
+      userId,
+    );
+
+    sendSuccess(res, { disassociated: true });
   } catch (error) {
     next(error);
   }

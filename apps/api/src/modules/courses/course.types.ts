@@ -33,6 +33,8 @@ export interface ICourseDocument extends Document {
   semester?: string;
   year?: number;
   cover: ICourseCover;
+  deadline?: Date;
+  progress?: number;
   source: CourseSource;
   status: CourseStatus;
   createdAt: Date;
@@ -62,6 +64,9 @@ export interface CourseResponse {
   semester?: string;
   year?: number;
   cover: ICourseCover;
+  deadline?: string;
+  progress: number;
+  studyPacksCount: number;
   source: CourseSource;
   status: CourseStatus;
   resourcesCount: number;
@@ -90,6 +95,8 @@ export interface CreateCourseDto {
   department?: string;
   semester?: string;
   year?: number;
+  deadline?: string | Date | null;
+  progress?: number;
   cover?: {
     color?: string;
     icon?: string;
@@ -106,11 +113,18 @@ export interface UpdateCourseDto {
   department?: string;
   semester?: string;
   year?: number;
+  deadline?: string | Date | null;
+  progress?: number;
   cover?: {
     color?: string;
     icon?: string;
   };
   status?: CourseStatus;
+}
+
+export interface AssociateCourseResourceDto {
+  resourceId: string;
+  position?: number;
 }
 
 export interface QueryCoursesDto {

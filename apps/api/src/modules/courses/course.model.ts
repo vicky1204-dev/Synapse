@@ -20,6 +20,8 @@ export interface ICourse extends Document {
     color: string;
     icon?: string;
   };
+  deadline?: Date;
+  progress?: number;
   source: "onboarding" | "user";
   status: "active" | "archived";
   createdAt: Date;
@@ -78,6 +80,15 @@ const courseSchema = new Schema<ICourse>(
       icon: {
         type: String,
       },
+    },
+    deadline: {
+      type: Date,
+    },
+    progress: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0,
     },
     source: {
       type: String,

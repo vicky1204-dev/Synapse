@@ -74,6 +74,14 @@ export function mapCourseToResponse(
       color: doc.cover?.color || "#3072FF",
       icon: doc.cover?.icon,
     },
+    deadline: doc.deadline ? doc.deadline.toISOString() : undefined,
+    progress:
+      doc.progress !== undefined && doc.progress !== null
+        ? doc.progress
+        : resourcesCount > 0
+          ? Math.min(100, resourcesCount * 20)
+          : 0,
+    studyPacksCount: Math.max(0, Math.ceil(resourcesCount / 3)),
     source: doc.source,
     status: doc.status,
     resourcesCount,
@@ -278,6 +286,8 @@ export async function createCourse(
     department: dto.department,
     semester: dto.semester,
     year: dto.year,
+    deadline: dto.deadline ? new Date(dto.deadline) : undefined,
+    progress: dto.progress ?? 0,
     cover: {
       color: dto.cover?.color || "#3072FF",
       icon: dto.cover?.icon,
@@ -328,6 +338,11 @@ export async function updateCourse(
   if (dto.semester !== undefined) course.semester = dto.semester;
   if (dto.year !== undefined) course.year = dto.year;
   if (dto.status !== undefined) course.status = dto.status;
+  if (dto.progress !== undefined) course.progress = dto.progress;
+
+  if (dto.deadline !== undefined) {
+    course.deadline = dto.deadline ? new Date(dto.deadline) : undefined;
+  }
 
   if (dto.subjectId !== undefined) {
     if (dto.subjectId === null) {
@@ -398,4 +413,75 @@ export async function deleteCourse(
     courseId,
     ownerId,
   });
+}
+
+export async function associateResourceToCourse(
+  courseId: string,
+  resourceId: string,
+  userId: string,
+  position = 0,
+): Promise<{ success: true }> {
+  if (!Types.ObjectId.isValid(courseId) || !Types.ObjectId.isValid(resourceId)) {
+    throw new BadRequestError("Invalid course or resource ID format", "INVALID_ID");
+  }
+
+  const course = await Course.findById(courseId);
+  if (!course) {
+    throw new NotFoundError("Course not found", "COURSE_NOT_FOUND");
+  }
+
+  if (course.ownerId.toString() !== userId) {
+    throw new ForbiddenError(
+      "Only the course owner can associate resources with this course",
+      "FORBIDDEN",
+    );
+  }
+
+  await CourseResource.findOneAndUpdate(
+    {
+      courseId: course._id,
+      resourceId: new Types.ObjectId(resourceId),
+    },
+    {
+      $set: {
+        addedBy: new Types.ObjectId(userId),
+        position,
+      },
+      $setOnInsert: {
+        createdAt: new Date(),
+      },
+    },
+    { upsert: true },
+  );
+
+  return { success: true };
+}
+
+export async function disassociateResourceFromCourse(
+  courseId: string,
+  resourceId: string,
+  userId: string,
+): Promise<{ success: true }> {
+  if (!Types.ObjectId.isValid(courseId) || !Types.ObjectId.isValid(resourceId)) {
+    throw new BadRequestError("Invalid course or resource ID format", "INVALID_ID");
+  }
+
+  const course = await Course.findById(courseId);
+  if (!course) {
+    throw new NotFoundError("Course not found", "COURSE_NOT_FOUND");
+  }
+
+  if (course.ownerId.toString() !== userId) {
+    throw new ForbiddenError(
+      "Only the course owner can disassociate resources from this course",
+      "FORBIDDEN",
+    );
+  }
+
+  await CourseResource.deleteOne({
+    courseId: new Types.ObjectId(courseId),
+    resourceId: new Types.ObjectId(resourceId),
+  });
+
+  return { success: true };
 }

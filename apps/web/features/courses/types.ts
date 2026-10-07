@@ -31,6 +31,9 @@ export interface Course {
   semester?: string;
   year?: number;
   cover: CourseCover;
+  deadline?: string;
+  progress: number;
+  studyPacksCount: number;
   source: CourseSource;
   status: CourseStatus;
   resourcesCount: number;
@@ -63,6 +66,8 @@ export interface CreateCourseRequest {
   department?: string;
   semester?: string;
   year?: number;
+  deadline?: string | null;
+  progress?: number;
   cover?: {
     color?: string;
     icon?: string;
@@ -79,6 +84,8 @@ export interface UpdateCourseRequest {
   department?: string;
   semester?: string;
   year?: number;
+  deadline?: string | null;
+  progress?: number;
   cover?: {
     color?: string;
     icon?: string;

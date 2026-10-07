@@ -41,7 +41,11 @@ import {
   EyeIcon,
   LockIcon,
   AlertCircleIcon,
+  CalendarIcon,
 } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { useCourses, useUpdateCourse } from "@/features/courses";
 import { cn } from "@/lib/utils";
 
 interface UploadDialogProps {
@@ -57,17 +61,6 @@ const STEPS = [
   { id: 4, name: "Preview" },
   { id: 5, name: "Publish" },
 ] as const;
-
-const ACADEMIC_SUBJECTS = [
-  "Operating Systems",
-  "Data Structures & Algorithms",
-  "Computer Networks",
-  "Database Management Systems",
-  "Computer Architecture",
-  "Software Engineering",
-  "Artificial Intelligence",
-  "Machine Learning",
-];
 
 const RECOMMENDED_TAGS = [
   "Memory management",
@@ -96,6 +89,11 @@ export function UploadDialog({
   const [tagInput, setTagInput] = useState("");
   const [shimmerIndex, setShimmerIndex] = useState<number>(0);
   const [isProcessingDone, setIsProcessingDone] = useState<boolean>(false);
+  const [selectedDeadline, setSelectedDeadline] = useState<string | null>(null);
+
+  const { data: userCoursesData } = useCourses({ status: "active", limit: 50 });
+  const coursesList = userCoursesData?.data ?? [];
+  const updateCourseMutation = useUpdateCourse();
 
   const uploadMutation = useUploadResource();
   const createMutation = useCreateResource();
@@ -110,7 +108,7 @@ export function UploadDialog({
       description: "",
       type: "pdf",
       visibility: "public",
-      courseId: courseId ?? "Operating Systems",
+      courseId: courseId ?? "",
       linkUrl: "",
       tags: ["Operating Systems", "Memory"],
       aiSummary:
@@ -122,10 +120,18 @@ export function UploadDialog({
   const uploadMode = useWatch({ control: form.control, name: "uploadMode" });
   const formValues = useWatch({ control: form.control });
 
-  // Reset modal state on close
+  // Reset modal state on close or set initial course on open
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
-    if (!isOpen) {
+    if (isOpen) {
+      if (courseId) {
+        form.setValue("courseId", courseId);
+        const matched = coursesList.find((c) => c.id === courseId);
+        if (matched?.deadline) {
+          setSelectedDeadline(new Date(matched.deadline).toISOString());
+        }
+      }
+    } else {
       setTimeout(() => {
         setCurrentStep(1);
         setSelectedFile(null);
@@ -133,6 +139,7 @@ export function UploadDialog({
         setTagInput("");
         setShimmerIndex(0);
         setIsProcessingDone(false);
+        setSelectedDeadline(null);
         form.reset();
       }, 200);
     }
@@ -289,6 +296,13 @@ export function UploadDialog({
         await uploadMutation.mutateAsync(formData);
       }
 
+      if (values.courseId && values.courseId !== "none" && selectedDeadline !== null) {
+        void updateCourseMutation.mutateAsync({
+          id: values.courseId,
+          data: { deadline: selectedDeadline },
+        });
+      }
+
       handleOpenChange(false);
       onSuccess?.();
     } catch {
@@ -427,32 +441,92 @@ export function UploadDialog({
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                 {/* Left Form Column */}
                 <div className="md:col-span-7 space-y-5">
-                  {/* Subject Dropdown using shadcn Select */}
+                  {/* Course / Subject Dropdown */}
                   <Field>
                     <FieldLabel className="text-xs font-semibold text-foreground">
-                      Subject
+                      Course Workspace
                     </FieldLabel>
                     <Controller
                       control={form.control}
                       name="courseId"
                       render={({ field }) => (
                         <Select
-                          value={field.value || "Operating Systems"}
-                          onValueChange={field.onChange}
+                          value={field.value || (courseId ? courseId : "")}
+                          onValueChange={(val) => {
+                            field.onChange(val === "none" ? "" : val);
+                            const matched = coursesList.find((c) => c.id === val);
+                            if (matched?.deadline) {
+                              setSelectedDeadline(new Date(matched.deadline).toISOString());
+                            }
+                          }}
                         >
                           <SelectTrigger className="w-full h-10 rounded-2xl border-input bg-background text-xs font-medium">
-                            <SelectValue placeholder="Select academic subject" />
+                            <SelectValue placeholder="Select course workspace" />
                           </SelectTrigger>
                           <SelectContent>
-                            {ACADEMIC_SUBJECTS.map((sub) => (
-                              <SelectItem key={sub} value={sub} className="text-xs">
-                                {sub}
+                            <SelectItem value="none" className="text-xs text-muted-foreground">
+                              General Library (No course)
+                            </SelectItem>
+                            {coursesList.map((c) => (
+                              <SelectItem key={c.id} value={c.id} className="text-xs">
+                                {c.title} {c.code ? `(${c.code})` : ""}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       )}
                     />
+                  </Field>
+
+                  {/* Target Deadline with Calendar */}
+                  <Field>
+                    <FieldLabel className="text-xs font-semibold text-foreground flex items-center justify-between">
+                      <span>Course Deadline / Exam Date</span>
+                      <span className="text-[11px] font-normal text-muted-foreground">Optional</span>
+                    </FieldLabel>
+                    <div className="flex items-center gap-2">
+                      <Popover>
+                        <PopoverTrigger
+                          render={
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="h-10 flex-1 justify-start rounded-2xl text-xs font-medium"
+                            />
+                          }
+                        >
+                          <CalendarIcon className="mr-2 size-4 text-muted-foreground" />
+                          {selectedDeadline
+                            ? new Date(selectedDeadline).toLocaleDateString(undefined, {
+                                dateStyle: "medium",
+                              })
+                            : "No deadline"}
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={selectedDeadline ? new Date(selectedDeadline) : undefined}
+                            onSelect={(date) => {
+                              setSelectedDeadline(date ? date.toISOString() : null);
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+
+                      {selectedDeadline && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedDeadline(null)}
+                          className="h-10 px-3 rounded-2xl text-xs text-muted-foreground hover:text-foreground"
+                          title="Clear deadline"
+                        >
+                          <XIcon className="size-3.5 mr-1" />
+                          No deadline
+                        </Button>
+                      )}
+                    </div>
                   </Field>
 
                   {/* Title with Validation Highlighting */}

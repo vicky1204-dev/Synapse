@@ -5,7 +5,13 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCourse, updateCourse, deleteCourse } from "./api";
+import {
+  createCourse,
+  updateCourse,
+  deleteCourse,
+  associateCourseResource,
+  disassociateCourseResource,
+} from "./api";
 import { courseKeys } from "./keys";
 import { toast } from "@/components/ui/toast";
 import type { CreateCourseRequest, UpdateCourseRequest } from "./types";
@@ -74,6 +80,70 @@ export function useDeleteCourse() {
       toast.add({
         title: "Delete failed",
         description: err.message || "Failed to delete course.",
+        type: "error",
+      });
+    },
+  });
+}
+
+export function useAssociateCourseResource() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      courseId,
+      resourceId,
+      position,
+    }: {
+      courseId: string;
+      resourceId: string;
+      position?: number;
+    }) => associateCourseResource(courseId, resourceId, position),
+    onSuccess: (_, { courseId }) => {
+      void queryClient.invalidateQueries({ queryKey: courseKeys.detail(courseId) });
+      void queryClient.invalidateQueries({ queryKey: courseKeys.resources(courseId) });
+      void queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
+      toast.add({
+        title: "Resource added to course",
+        description: "The resource is now linked to this course workspace.",
+        type: "success",
+      });
+    },
+    onError: (err: Error) => {
+      toast.add({
+        title: "Link failed",
+        description: err.message || "Failed to link resource to course.",
+        type: "error",
+      });
+    },
+  });
+}
+
+export function useDisassociateCourseResource() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      courseId,
+      resourceId,
+    }: {
+      courseId: string;
+      resourceId: string;
+    }) => disassociateCourseResource(courseId, resourceId),
+    onSuccess: (_, { courseId }) => {
+      void queryClient.invalidateQueries({ queryKey: courseKeys.detail(courseId) });
+      void queryClient.invalidateQueries({ queryKey: courseKeys.resources(courseId) });
+      void queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
+      toast.add({
+        title: "Resource removed",
+        description: "The resource was unlinked from this course workspace.",
+        type: "success",
+      });
+    },
+    onError: (err: Error) => {
+      toast.add({
+        title: "Unlink failed",
+        description: err.message || "Failed to unlink resource from course.",
         type: "error",
       });
     },

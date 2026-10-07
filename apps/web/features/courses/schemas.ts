@@ -53,6 +53,7 @@ export const courseFormSchema = z.object({
     .string()
     .trim()
     .regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, "Valid hex color required"),
+  deadline: z.string().nullable().optional(),
   status: z.enum(["active", "archived"]),
 });
 

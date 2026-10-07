@@ -84,3 +84,24 @@ export async function fetchCourseResources(
     .get(`api/v1/courses/${courseId}/resources`, { searchParams })
     .json<ApiPaginatedResponse<CourseResourceItem>>();
 }
+
+export async function associateCourseResource(
+  courseId: string,
+  resourceId: string,
+  position = 0,
+): Promise<{ success: true }> {
+  return apiClient
+    .post(`api/v1/courses/${courseId}/resources`, {
+      json: { resourceId, position },
+    })
+    .json<{ success: true }>();
+}
+
+export async function disassociateCourseResource(
+  courseId: string,
+  resourceId: string,
+): Promise<{ success: true }> {
+  return apiClient
+    .delete(`api/v1/courses/${courseId}/resources/${resourceId}`)
+    .json<{ success: true }>();
+}

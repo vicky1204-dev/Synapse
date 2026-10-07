@@ -19,5 +19,10 @@ courseRouter.get("/:courseId", courseController.getCourse);
 courseRouter.patch("/:courseId", courseController.updateCourse);
 courseRouter.delete("/:courseId", courseController.deleteCourse);
 courseRouter.get("/:courseId/resources", courseController.getCourseResources);
+courseRouter.post("/:courseId/resources", courseController.associateResource);
+courseRouter.delete(
+  "/:courseId/resources/:resourceId",
+  courseController.disassociateResource,
+);
 
 export { courseRouter };

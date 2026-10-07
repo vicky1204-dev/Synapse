@@ -23,6 +23,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { useSubjects } from "@/features/onboarding/queries";
 import { useCreateCourse, useUpdateCourse } from "../mutations";
 import {
@@ -31,7 +33,7 @@ import {
   type CourseFormValues,
 } from "../schemas";
 import type { Course } from "../types";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, CalendarIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CourseDialogProps {
@@ -66,6 +68,7 @@ export function CourseDialog({
       department: "",
       semester: "",
       year: new Date().getFullYear(),
+      deadline: null,
       color: COURSE_COVER_PRESETS[0],
       status: "active",
     },
@@ -83,6 +86,7 @@ export function CourseDialog({
           department: course.department || "",
           semester: course.semester || "",
           year: course.year || new Date().getFullYear(),
+          deadline: course.deadline ? new Date(course.deadline).toISOString() : null,
           color: course.cover?.color || COURSE_COVER_PRESETS[0],
           status: course.status || "active",
         });
@@ -95,6 +99,7 @@ export function CourseDialog({
           department: "",
           semester: "",
           year: new Date().getFullYear(),
+          deadline: null,
           color:
             COURSE_COVER_PRESETS[
               Math.floor(Math.random() * COURSE_COVER_PRESETS.length)
@@ -107,6 +112,7 @@ export function CourseDialog({
 
   const currentColor =
     useWatch({ control: form.control, name: "color" }) || COURSE_COVER_PRESETS[0];
+  const currentDeadline = useWatch({ control: form.control, name: "deadline" });
 
   const onSubmit = async (values: CourseFormValues) => {
     try {
@@ -118,6 +124,7 @@ export function CourseDialog({
         department: values.department?.trim() || undefined,
         semester: values.semester?.trim() || undefined,
         year: values.year ? Number(values.year) : undefined,
+        deadline: values.deadline ? new Date(values.deadline).toISOString() : null,
         cover: {
           color: values.color,
         },
@@ -265,6 +272,59 @@ export function CourseDialog({
               <FieldError errors={[form.formState.errors.year]} />
             </Field>
           </div>
+
+          {/* Target Deadline / Exam Date with Calendar */}
+          <Field>
+            <FieldLabel className="text-xs font-semibold text-foreground flex items-center justify-between">
+              <span>Exam / Target Deadline</span>
+              <span className="text-[11px] font-normal text-muted-foreground">Optional</span>
+            </FieldLabel>
+            <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger
+                  render={
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-10 flex-1 justify-start rounded-2xl text-xs font-medium"
+                    />
+                  }
+                >
+                  <CalendarIcon className="mr-2 size-4 text-muted-foreground" />
+                  {currentDeadline
+                    ? new Date(currentDeadline).toLocaleDateString(undefined, {
+                        dateStyle: "medium",
+                      })
+                    : "No deadline"}
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={currentDeadline ? new Date(currentDeadline) : undefined}
+                    onSelect={(date) => {
+                      form.setValue("deadline", date ? date.toISOString() : null, {
+                        shouldDirty: true,
+                      });
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              {currentDeadline && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => form.setValue("deadline", null, { shouldDirty: true })}
+                  className="h-10 px-3 rounded-2xl text-xs text-muted-foreground hover:text-foreground"
+                  title="Clear deadline"
+                >
+                  <XIcon className="size-3.5 mr-1" />
+                  No deadline
+                </Button>
+              )}
+            </div>
+          </Field>
 
           {/* Cover Color Palette Swatches */}
           <Field>

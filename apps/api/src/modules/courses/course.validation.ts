@@ -56,6 +56,8 @@ export const createCourseSchema = z.object({
     .min(1900, "Year must be 1900 or later")
     .max(2100, "Year must be 2100 or earlier")
     .optional(),
+  deadline: z.string().datetime().optional().or(z.date()).or(z.null()),
+  progress: z.number().min(0).max(100).optional(),
   cover: courseCoverSchema.optional(),
   source: z.enum(COURSE_SOURCES).default("user"),
   status: z.enum(COURSE_STATUSES).default("active"),
@@ -100,6 +102,8 @@ export const updateCourseSchema = z.object({
     .min(1900, "Year must be 1900 or later")
     .max(2100, "Year must be 2100 or earlier")
     .optional(),
+  deadline: z.union([z.string().datetime(), z.date(), z.null()]).optional(),
+  progress: z.number().min(0).max(100).optional(),
   cover: courseCoverSchema.partial().optional(),
   status: z.enum(COURSE_STATUSES).optional(),
 });
@@ -121,6 +125,25 @@ export const courseParamsSchema = z.object({
     .string()
     .trim()
     .regex(objectIdRegex, "Invalid course ID format"),
+});
+
+export const courseResourceParamsSchema = z.object({
+  courseId: z
+    .string()
+    .trim()
+    .regex(objectIdRegex, "Invalid course ID format"),
+  resourceId: z
+    .string()
+    .trim()
+    .regex(objectIdRegex, "Invalid resource ID format"),
+});
+
+export const associateCourseResourceSchema = z.object({
+  resourceId: z
+    .string()
+    .trim()
+    .regex(objectIdRegex, "Invalid resource ID format"),
+  position: z.number().int().min(0).optional(),
 });
 
 export const courseResourcesQuerySchema = z.object({
