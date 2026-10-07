@@ -24,12 +24,15 @@ import {
   EmptyDescription,
   EmptyContent,
 } from "@/components/ui/empty";
+import { Button } from "@/components/ui/button";
 import {
   SearchIcon,
   DownloadIcon,
   LayoutGridIcon,
   ListIcon,
   BookOpenIcon,
+  KeyboardIcon,
+  SlidersHorizontalIcon,
 } from "lucide-react";
 import type { Resource, ResourceType, ResourceVisibility } from "../types";
 import { cn } from "@/lib/utils";
@@ -41,6 +44,7 @@ export function LibraryView() {
   const [selectedTopic, setSelectedTopic] = useState<string | undefined>(undefined);
   const [selectedVisibility, setSelectedVisibility] = useState<ResourceVisibility | undefined>(undefined);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [showFilterPanel, setShowFilterPanel] = useState(true);
   const [page, setPage] = useState(1);
   const limit = 9;
 
@@ -114,49 +118,70 @@ export function LibraryView() {
         </div>
       </div>
 
-      {/* Main Search Bar */}
-      <form onSubmit={handleSearchSubmit} className="relative flex items-center">
-        <div className="relative flex-1">
-          <SearchIcon className="text-muted-foreground absolute top-1/2 left-4 size-4 -translate-y-1/2" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by title, topic, or tags..."
-            className="h-12 w-full rounded-full border border-border/80 bg-background pl-11 pr-28 text-xs shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20"
-          />
+      {/* Main Search Bar — unified with discussion page style */}
+      <form
+        onSubmit={handleSearchSubmit}
+        className="flex items-center gap-2 rounded-2xl border border-border/70 bg-card p-2 shadow-xs transition focus-within:border-primary/50"
+      >
+        <div className="flex items-center gap-2 pl-2 text-muted-foreground">
+          <KeyboardIcon className="size-4 shrink-0" />
         </div>
-        <button
-          type="submit"
-          className="absolute right-1.5 top-1.5 bottom-1.5 rounded-full bg-neutral-900 px-5 text-xs font-semibold text-white transition hover:bg-neutral-800 dark:bg-foreground dark:text-background cursor-pointer"
-        >
-          Search
-        </button>
+        <Input
+          placeholder="Search by title, topic, or tags..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="border-none shadow-none focus-visible:ring-0 text-sm bg-transparent px-1 placeholder:text-muted-foreground/70"
+        />
+        <div className="flex items-center gap-2 pr-1 shrink-0">
+          <Button
+            type="submit"
+            size="sm"
+            variant="ghost"
+            className="rounded-xl text-xs font-semibold gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <SearchIcon className="size-3.5" />
+            <span>Search</span>
+          </Button>
+
+          <Button
+            type="button"
+            size="sm"
+            variant={showFilterPanel ? "secondary" : "ghost"}
+            onClick={() => setShowFilterPanel(!showFilterPanel)}
+            className="rounded-xl text-xs font-semibold gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <SlidersHorizontalIcon className="size-3.5" />
+            <span>Filter</span>
+          </Button>
+        </div>
       </form>
 
       {/* Filters Section (Decomposed into ResourceFilters component) */}
-      <ResourceFilters
-        selectedType={selectedType}
-        onSelectType={(type) => {
-          setSelectedType(type);
-          setPage(1);
-        }}
-        selectedTopic={selectedTopic}
-        onSelectTopic={(topic) => {
-          setSelectedTopic(topic);
-          setPage(1);
-        }}
-        selectedVisibility={selectedVisibility}
-        onSelectVisibility={(visibility) => {
-          setSelectedVisibility(visibility);
-          setPage(1);
-        }}
-        activeSearch={activeSearch}
-        onClearSearch={() => {
-          setActiveSearch("");
-          setSearchQuery("");
-        }}
-        onResetAll={handleResetFilters}
-      />
+      {showFilterPanel && (
+        <ResourceFilters
+          selectedType={selectedType}
+          onSelectType={(type) => {
+            setSelectedType(type);
+            setPage(1);
+          }}
+          selectedTopic={selectedTopic}
+          onSelectTopic={(topic) => {
+            setSelectedTopic(topic);
+            setPage(1);
+          }}
+          selectedVisibility={selectedVisibility}
+          onSelectVisibility={(visibility) => {
+            setSelectedVisibility(visibility);
+            setPage(1);
+          }}
+          activeSearch={activeSearch}
+          onClearSearch={() => {
+            setActiveSearch("");
+            setSearchQuery("");
+          }}
+          onResetAll={handleResetFilters}
+        />
+      )}
 
       {/* Results Header with View Mode Switcher */}
       <div className="flex items-center justify-between border-t border-border/50 pt-4">
