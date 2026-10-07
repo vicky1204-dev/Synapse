@@ -20,6 +20,8 @@ export interface ICourse extends Document {
     color: string;
     icon?: string;
   };
+  deadline?: Date;
+  progress?: number;
   source: "onboarding" | "user";
   status: "active" | "archived";
   createdAt: Date;
@@ -79,6 +81,15 @@ const courseSchema = new Schema<ICourse>(
         type: String,
       },
     },
+    deadline: {
+      type: Date,
+    },
+    progress: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0,
+    },
     source: {
       type: String,
       enum: ["onboarding", "user"],
@@ -97,5 +108,6 @@ const courseSchema = new Schema<ICourse>(
 // Compound indexes
 courseSchema.index({ ownerId: 1, status: 1 });
 courseSchema.index({ ownerId: 1, subjectId: 1 });
+courseSchema.index({ ownerId: 1, createdAt: -1 });
 
 export const Course = model<ICourse>("Course", courseSchema);

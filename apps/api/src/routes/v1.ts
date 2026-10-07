@@ -17,6 +17,7 @@ import { usersRouter } from "../modules/users/users.routes";
 
 import { resourceRouter } from "../modules/resources/resource.routes";
 import { savedRouter } from "../modules/resources/saved.routes";
+import { courseRouter } from "../modules/courses/course.routes";
 
 const v1Router = Router();
 
@@ -26,9 +27,9 @@ v1Router.use("/subjects", subjectRouter);
 v1Router.use("/users", usersRouter);
 v1Router.use("/resources", resourceRouter);
 v1Router.use("/saved", savedRouter);
+v1Router.use("/courses", courseRouter);
 
 // Future module routers are mounted here:
-// v1Router.use("/courses", coursesRouter);
 // v1Router.use("/discussions", discussionsRouter);
 // v1Router.use("/study", studyRouter);
 
