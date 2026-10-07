@@ -60,6 +60,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Resource, ResourceType } from "../types";
+import {
+  useDiscussions,
+  CreateDiscussionDialog,
+  formatTimeAgo,
+  getInitials,
+  type Discussion,
+} from "@/features/discussions";
 
 interface ResourceDetailViewProps {
   resourceId: string;
@@ -102,35 +109,6 @@ const TYPE_CONFIG: Record<
 };
 
 // ---------------------------------------------------------------------------
-// Discussion placeholder (future feature)
-// ---------------------------------------------------------------------------
-
-interface PlaceholderDiscussion {
-  id: string;
-  author: string;
-  authorInitials: string;
-  timeAgo: string;
-  body: string;
-}
-
-const PLACEHOLDER_DISCUSSIONS: PlaceholderDiscussion[] = [
-  {
-    id: "d1",
-    author: "Sarah M.",
-    authorInitials: "SM",
-    timeAgo: "2h ago",
-    body: "Does LRU always replace the least recently used page? I found a scenario where the algorithm seems to skip a page that hasn't been accessed in hours.",
-  },
-  {
-    id: "d2",
-    author: "Rajan K.",
-    authorInitials: "RK",
-    timeAgo: "5h ago",
-    body: "Great resource! The section on virtual memory management is particularly clear. Bookmarked this for revision before the OS exam.",
-  },
-];
-
-// ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
 
@@ -154,26 +132,38 @@ function SidebarSection({
   );
 }
 
-function DiscussionItem({ discussion }: { discussion: PlaceholderDiscussion }) {
+function DiscussionItem({ discussion }: { discussion: Discussion }) {
   return (
-    <div className="space-y-2 rounded-2xl border border-border/60 bg-muted/30 p-3.5">
+    <Link
+      href={`/discussions/${discussion.id}`}
+      className="block space-y-2 rounded-2xl border border-border/60 bg-muted/30 p-3.5 transition hover:border-primary/40 hover:bg-muted/50"
+    >
       <div className="flex items-center gap-2">
         <Avatar className="size-6 shrink-0" size="sm">
+          {discussion.author?.avatarUrl && (
+            <AvatarImage
+              src={discussion.author.avatarUrl}
+              alt={discussion.author.name}
+            />
+          )}
           <AvatarFallback className="text-[9px] font-bold">
-            {discussion.authorInitials}
+            {getInitials(discussion.author?.name)}
           </AvatarFallback>
         </Avatar>
-        <span className="text-xs font-semibold text-foreground">
-          {discussion.author}
+        <span className="text-xs font-semibold text-foreground truncate max-w-[120px]">
+          {discussion.author?.name || "Student"}
         </span>
         <span className="text-[10px] text-muted-foreground ml-auto">
-          {discussion.timeAgo}
+          {formatTimeAgo(discussion.createdAt)}
         </span>
       </div>
-      <p className="text-xs text-muted-foreground leading-relaxed">
+      <h4 className="text-xs font-semibold text-foreground line-clamp-1">
+        {discussion.title}
+      </h4>
+      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
         {discussion.body}
       </p>
-    </div>
+    </Link>
   );
 }
 
@@ -272,6 +262,12 @@ export function ResourceDetailView({ resourceId }: ResourceDetailViewProps) {
   const deleteMutation = useDeleteResource();
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDiscussionDialogOpen, setIsDiscussionDialogOpen] = useState(false);
+
+  const { data: discussionsData } = useDiscussions({
+    resourceId: resource?.id,
+  });
+  const discussions = discussionsData?.data ?? [];
 
   const authUser = useAuthStore((s) => s.user);
   const { data: currentUser } = useCurrentUser();
@@ -563,21 +559,28 @@ export function ResourceDetailView({ resourceId }: ResourceDetailViewProps) {
                 </>
               )}
 
-              {/* Discussions (placeholder — future feature) */}
+              {/* Discussions */}
               <Separator />
               <SidebarSection
                 icon={<MessageSquareIcon className="size-3.5" />}
                 title="Discussions"
               >
-                <div className="space-y-2.5">
-                  {PLACEHOLDER_DISCUSSIONS.map((d) => (
-                    <DiscussionItem key={d.id} discussion={d} />
-                  ))}
-                </div>
+                {discussions.length > 0 ? (
+                  <div className="space-y-2.5">
+                    {discussions.map((d) => (
+                      <DiscussionItem key={d.id} discussion={d} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground py-0.5">
+                    No discussions attached to this resource yet.
+                  </p>
+                )}
 
                 {/* CTA to start discussion */}
                 <button
                   type="button"
+                  onClick={() => setIsDiscussionDialogOpen(true)}
                   className="mt-1 w-full rounded-xl border border-dashed border-border/70 py-2.5 text-xs font-medium text-muted-foreground transition hover:border-primary/40 hover:text-primary cursor-pointer"
                 >
                   + Start a discussion
@@ -646,6 +649,14 @@ export function ResourceDetailView({ resourceId }: ResourceDetailViewProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {resource && (
+        <CreateDiscussionDialog
+          open={isDiscussionDialogOpen}
+          onOpenChange={setIsDiscussionDialogOpen}
+          initialResourceId={resource.id}
+        />
+      )}
     </div>
   );
 }
