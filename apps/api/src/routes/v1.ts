@@ -24,6 +24,8 @@ import {
   commentRouter,
 } from "../modules/discussions/discussion.routes";
 
+import { studyRouter } from "../modules/study/study.routes";
+
 const v1Router = Router();
 
 v1Router.use("/health", healthRouter);
@@ -35,8 +37,6 @@ v1Router.use("/saved", savedRouter);
 v1Router.use("/courses", courseRouter);
 v1Router.use("/discussions", discussionRouter);
 v1Router.use("/comments", commentRouter);
-
-// Future module routers are mounted here:
-// v1Router.use("/study", studyRouter);
+v1Router.use("/study", studyRouter);
 
 export { v1Router };

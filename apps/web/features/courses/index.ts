@@ -19,3 +19,4 @@ export * from "./components/course-resources-tab";
 export * from "./components/course-study-tab";
 export * from "./components/course-discussions-tab";
 export * from "./components/link-resource-dialog";
+export * from "./components/add-to-course-dialog";

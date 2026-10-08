@@ -67,6 +67,7 @@ import {
   getInitials,
   type Discussion,
 } from "@/features/discussions";
+import { AddToCourseDialog } from "@/features/courses";
 
 interface ResourceDetailViewProps {
   resourceId: string;
@@ -263,6 +264,7 @@ export function ResourceDetailView({ resourceId }: ResourceDetailViewProps) {
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDiscussionDialogOpen, setIsDiscussionDialogOpen] = useState(false);
+  const [isAddToCourseOpen, setIsAddToCourseOpen] = useState(false);
 
   const { data: discussionsData } = useDiscussions({
     resourceId: resource?.id,
@@ -412,11 +414,17 @@ export function ResourceDetailView({ resourceId }: ResourceDetailViewProps) {
               }
             />
             <DropdownMenuContent align="end" sideOffset={6}>
-              <DropdownMenuItem className="gap-2.5 text-xs">
+              <DropdownMenuItem
+                className="gap-2.5 text-xs cursor-pointer"
+                onClick={() => setIsDiscussionDialogOpen(true)}
+              >
                 <MessageSquareIcon className="size-3.5 text-muted-foreground" />
                 <span>Open discussion</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="gap-2.5 text-xs">
+              <DropdownMenuItem
+                className="gap-2.5 text-xs cursor-pointer"
+                onClick={() => setIsAddToCourseOpen(true)}
+              >
                 <BookOpenIcon className="size-3.5 text-muted-foreground" />
                 <span>Add to course</span>
               </DropdownMenuItem>
@@ -655,6 +663,15 @@ export function ResourceDetailView({ resourceId }: ResourceDetailViewProps) {
           open={isDiscussionDialogOpen}
           onOpenChange={setIsDiscussionDialogOpen}
           initialResourceId={resource.id}
+        />
+      )}
+
+      {resource && (
+        <AddToCourseDialog
+          open={isAddToCourseOpen}
+          onOpenChange={setIsAddToCourseOpen}
+          resourceId={resource.id}
+          resourceTitle={resource.title}
         />
       )}
     </div>

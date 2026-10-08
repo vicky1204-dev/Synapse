@@ -8,6 +8,7 @@ import { Router } from "express";
 import { authenticate } from "../../middleware/authenticate";
 import * as courseController from "./course.controller";
 import * as discussionController from "../discussions/discussion.controller";
+import * as studyController from "../study/study.controller";
 
 const courseRouter = Router();
 
@@ -26,5 +27,7 @@ courseRouter.delete(
   courseController.disassociateResource,
 );
 courseRouter.get("/:courseId/discussions", discussionController.getCourseDiscussions);
+courseRouter.get("/:courseId/study", studyController.getCourseStudy);
+courseRouter.get("/:courseId/progress", studyController.getCourseProgress);
 
 export { courseRouter };

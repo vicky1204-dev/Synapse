@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   LightbulbIcon,
@@ -9,8 +10,12 @@ import {
   FileTextIcon,
   RotateCwIcon,
   GlobeIcon,
+  ArrowRightIcon,
+  PlayIcon,
+  ClockIcon,
 } from "lucide-react";
 import type { Course, CourseResourceItem } from "../types";
+import { useCourseStudy } from "@/features/study";
 
 interface CourseOverviewTabProps {
   course: Course;
@@ -23,25 +28,37 @@ export function CourseOverviewTab({
   resources,
   onTabChange,
 }: CourseOverviewTabProps) {
+  const { data: studyData } = useCourseStudy(course.id);
+  const activities = studyData?.activities ?? [];
+  const progress = studyData?.progress;
+
   const resourcesCount = resources.length;
+  const totalActivities = progress?.totalActivityCount ?? activities.length;
+  const completedActivities = progress?.completedActivityCount ?? 0;
   const progressPercent =
-    course.progress !== undefined && course.progress !== null
+    progress?.completionPercentage ??
+    (course.progress !== undefined && course.progress !== null
       ? course.progress
-      : resourcesCount > 0
-        ? Math.min(100, resourcesCount * 20)
-        : 0;
+      : totalActivities > 0
+        ? Math.round((completedActivities / totalActivities) * 100)
+        : 0);
+  const totalStudyTimeMinutes = progress?.totalStudyTimeMinutes ?? 0;
 
-  const totalActivities = Math.max(6, resourcesCount * 4);
-  const completedActivities = Math.round((progressPercent / 100) * totalActivities);
+  const nextActivity =
+    activities.find((a) => a.progress?.status !== "completed") ||
+    activities[0];
 
-  const totalConcepts = Math.max(3, resourcesCount * 2);
-  const masteredConcepts = Math.round((progressPercent / 100) * totalConcepts);
+  const nextUpTitle =
+    nextActivity?.title ??
+    (resources[0]?.resource?.title
+      ? `Study ${resources[0]?.resource?.title}`
+      : `${course.title} Fundamentals`);
 
-  const firstResource = resources[0]?.resource;
-  const nextUpTitle = firstResource?.title ?? `${course.title} Fundamentals`;
   const nextUpSummary =
-    firstResource?.aiMetadata?.summary ??
-    "Review core concepts, definitions, and lecture materials before moving into active practice questions.";
+    nextActivity?.description ??
+    (nextActivity?.resource
+      ? `Review materials and concepts from ${nextActivity.resource.title}.`
+      : "Review core definitions, architecture, and lecture materials before moving into practice.");
 
   return (
     <div className="space-y-6">
@@ -62,16 +79,52 @@ export function CourseOverviewTab({
           </p>
         </div>
 
-        {/* Next Up Container */}
-        <div className="rounded-2xl border border-border/50 bg-background/60 p-4 sm:p-5 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
-            <LightbulbIcon className="size-4 text-amber-500" />
-            <span>Next up</span>
+        {/* Next Up / Continue Studying Container */}
+        <div className="rounded-2xl border border-border/50 bg-background/60 p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-semibold text-foreground/80">
+              <LightbulbIcon className="size-4 text-amber-500" />
+              <span>Next up in Study Plan</span>
+            </div>
+            {nextActivity?.progress?.status === "in-progress" && (
+              <span className="flex items-center gap-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                <ClockIcon className="size-3" />
+                In Progress
+              </span>
+            )}
           </div>
-          <p className="text-sm font-semibold text-foreground">{nextUpTitle}</p>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {nextUpSummary}
-          </p>
+
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-foreground">{nextUpTitle}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {nextUpSummary}
+            </p>
+          </div>
+
+          <div className="pt-1 flex items-center gap-3">
+            {nextActivity ? (
+              <Link
+                href={`/study/${nextActivity.id}`}
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary/90 transition"
+              >
+                <PlayIcon className="size-3 fill-current" />
+                <span>
+                  {nextActivity.progress?.status === "in-progress"
+                    ? "Continue Studying"
+                    : "Start Activity"}
+                </span>
+                <ArrowRightIcon className="size-3 ml-0.5" />
+              </Link>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => onTabChange("study")}
+                className="rounded-full text-xs"
+              >
+                Go to Study Plan
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -79,9 +132,16 @@ export function CourseOverviewTab({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Learning Progress */}
         <div className="lg:col-span-7 flex flex-col justify-between rounded-3xl border border-border/70 bg-card/60 p-6 sm:p-7 backdrop-blur-xs shadow-xs space-y-6">
-          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            <BookOpenIcon className="size-4 text-primary" />
-            <span>Learning progress</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <BookOpenIcon className="size-4 text-primary" />
+              <span>Learning progress</span>
+            </div>
+            {totalStudyTimeMinutes > 0 && (
+              <span className="text-[11px] font-mono text-muted-foreground">
+                {totalStudyTimeMinutes} min logged
+              </span>
+            )}
           </div>
 
           {/* Completed activities */}
@@ -101,29 +161,26 @@ export function CourseOverviewTab({
               />
             </div>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Flashcards, quizzes, concept reviews, and study steps are counted toward
-              course completion.
+              Activities completed count toward course mastery and completion.
             </p>
           </div>
 
-          {/* Concept mastery */}
+          {/* Overall completion */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold text-foreground">
-              <span>Concept mastery</span>
-              <span className="tabular-nums font-mono">
-                {masteredConcepts}/{totalConcepts}
-              </span>
+              <span>Course progress</span>
+              <span className="tabular-nums font-mono">{progressPercent}%</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-primary/15 dark:bg-primary/25">
               <div
                 className="h-full rounded-full bg-primary transition-all duration-500"
                 style={{
-                  width: `${totalConcepts > 0 ? (masteredConcepts / totalConcepts) * 100 : 0}%`,
+                  width: `${progressPercent}%`,
                 }}
               />
             </div>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Core concepts and terminology from lecture materials and review notes.
+              Overall course progress tracked across study activities and resources.
             </p>
           </div>
         </div>
@@ -136,7 +193,8 @@ export function CourseOverviewTab({
               <span>{course.title} - Study Pack</span>
             </div>
             <p className="text-xs text-muted-foreground pt-1">
-              Based on {resourcesCount} {resourcesCount === 1 ? "resource" : "resources"}
+              Based on {resourcesCount} {resourcesCount === 1 ? "resource" : "resources"} •{" "}
+              {activities.length} activities
             </p>
           </div>
 
@@ -146,7 +204,7 @@ export function CourseOverviewTab({
             <div className="space-y-2">
               {resources.length === 0 ? (
                 <p className="text-xs text-muted-foreground italic py-1">
-                  No resources linked yet. Add notes to generate study pack sources.
+                  No resources linked yet. Add materials to generate study pack sources.
                 </p>
               ) : (
                 resources.slice(0, 3).map((item) => (
@@ -168,13 +226,22 @@ export function CourseOverviewTab({
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/40">
-            <Button
-              size="sm"
-              onClick={() => onTabChange("study")}
-              className="rounded-full px-4 text-xs font-semibold shadow-xs"
-            >
-              Study
-            </Button>
+            {nextActivity ? (
+              <Link
+                href={`/study/${nextActivity.id}`}
+                className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary/90 transition"
+              >
+                Study
+              </Link>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => onTabChange("study")}
+                className="rounded-full px-4 text-xs font-semibold shadow-xs"
+              >
+                Study
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"

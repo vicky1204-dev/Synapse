@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { CourseDetailView } from "@/features/courses";
 
@@ -12,5 +13,9 @@ interface CoursePageProps {
 
 export default async function CoursePage({ params }: CoursePageProps) {
   const { courseId } = await params;
-  return <CourseDetailView courseId={courseId} />;
+  return (
+    <Suspense>
+      <CourseDetailView courseId={courseId} />
+    </Suspense>
+  );
 }
