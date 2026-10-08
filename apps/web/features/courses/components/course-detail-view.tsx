@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -30,7 +30,16 @@ type TabType = "overview" | "resources" | "study" | "discussions";
 
 export function CourseDetailView({ courseId }: CourseDetailViewProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = React.useState<TabType>("overview");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") as TabType | null;
+  const initialTab =
+    tabParam && ["overview", "resources", "study", "discussions"].includes(tabParam)
+      ? tabParam
+      : "overview";
+
+  const [selectedTab, setSelectedTab] = React.useState<TabType | null>(null);
+  const activeTab = selectedTab ?? initialTab;
+  const setActiveTab = setSelectedTab;
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
 
   const {

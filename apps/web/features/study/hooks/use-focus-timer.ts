@@ -70,9 +70,24 @@ export function useFocusTimer({
     };
   }, [isRunning, mode, flushUnrecordedSeconds]);
 
-  // Flush on pause or unmount
+  // Flush on pause, unmount, tab switch, or window unload
   useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        flushUnrecordedSeconds();
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      flushUnrecordedSeconds();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
     return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       flushUnrecordedSeconds();
     };
   }, [flushUnrecordedSeconds]);

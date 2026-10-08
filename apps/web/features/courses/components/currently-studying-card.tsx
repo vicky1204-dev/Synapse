@@ -226,7 +226,10 @@ export function CurrentlyStudyingCard({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleOpenWorkspace}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/courses/${course.id}?tab=study`);
+                }}
                 className="rounded-full px-4 text-xs font-semibold hover:bg-foreground hover:text-background transition-colors"
               >
                 Continue Studying

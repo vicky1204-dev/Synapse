@@ -58,7 +58,13 @@ export function useStartActivity(activityId: string, courseId?: string) {
         void queryClient.invalidateQueries({
           queryKey: studyKeys.courseStudy(courseId),
         });
+        void queryClient.invalidateQueries({
+          queryKey: studyKeys.courseProgress(courseId),
+        });
       }
+      void queryClient.invalidateQueries({
+        queryKey: studyKeys.recent(),
+      });
     },
   });
 }
@@ -75,9 +81,15 @@ export function useHeartbeatActivity(activityId: string, courseId?: string) {
       });
       if (courseId) {
         void queryClient.invalidateQueries({
+          queryKey: studyKeys.courseStudy(courseId),
+        });
+        void queryClient.invalidateQueries({
           queryKey: studyKeys.courseProgress(courseId),
         });
       }
+      void queryClient.invalidateQueries({
+        queryKey: studyKeys.recent(),
+      });
     },
   });
 }

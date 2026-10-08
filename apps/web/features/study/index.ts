@@ -11,3 +11,4 @@ export * from "./hooks/use-focus-timer";
 export * from "./components/focus-timer";
 export * from "./components/study-workspace-view";
 export * from "./components/study-entry-view";
+export * from "./components/continue-studying-card";
