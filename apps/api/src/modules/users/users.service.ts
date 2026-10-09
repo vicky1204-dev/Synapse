@@ -7,9 +7,21 @@
 import { Types } from "mongoose";
 import { User } from "./user.model";
 import { Subject } from "../subjects/subject.model";
+import { Resource } from "../resources/resource.model";
+import { SavedResource } from "../resources/saved-resource.model";
+import { Discussion } from "../discussions/discussion.model";
+import { Comment } from "../discussions/comment.model";
 import { mapUserToResponse } from "../auth/auth.service";
+import { mapResourceToResponse } from "../resources/resource.service";
+import { mapDiscussionToResponse } from "../discussions/discussion.service";
+import type { IResource } from "../resources/resource.types";
+import type { IDiscussion } from "../discussions/discussion.types";
 import type { UserResponse } from "../auth/auth.types";
-import type { UpdateOnboardingDto, UpdateProfileDto } from "./users.types";
+import type {
+  UpdateOnboardingDto,
+  UpdateProfileDto,
+  UserContributionsResponse,
+} from "./users.types";
 import { NotFoundError, BadRequestError } from "../../middleware/error-handler";
 import { logger } from "../../lib/logger";
 
@@ -142,4 +154,98 @@ export async function updateProfile(
   });
 
   return mapUserToResponse(user);
+}
+
+export async function getUserContributions(
+  userId: string,
+): Promise<UserContributionsResponse> {
+  const userObjectId = new Types.ObjectId(userId);
+
+  // 1. Fetch user's uploaded resources
+  const resourceDocs = await Resource.find({ uploaderId: userObjectId })
+    .populate("uploaderId", "name avatarUrl")
+    .sort({ createdAt: -1 });
+
+  const resourceIds = resourceDocs.map((r) => r._id);
+
+  // 2. Fetch saves info:
+  // - total saves received across all user's uploaded resources
+  // - whether current user saved their own resources
+  // - individual savesCount per uploaded resource
+  const [totalSavesReceived, savedByUserDocs, savesAggregation] = await Promise.all([
+    resourceIds.length > 0
+      ? SavedResource.countDocuments({ resourceId: { $in: resourceIds } })
+      : 0,
+    resourceIds.length > 0
+      ? SavedResource.find({
+          userId: userObjectId,
+          resourceId: { $in: resourceIds },
+        })
+      : [],
+    resourceIds.length > 0
+      ? SavedResource.aggregate<{ _id: Types.ObjectId; count: number }>([
+          { $match: { resourceId: { $in: resourceIds } } },
+          { $group: { _id: "$resourceId", count: { $sum: 1 } } },
+        ])
+      : [],
+  ]);
+
+  const savedSet = new Set(savedByUserDocs.map((s) => s.resourceId.toString()));
+  const savesCountMap = new Map(
+    savesAggregation.map((a) => [a._id.toString(), a.count]),
+  );
+
+  const uploadedResources = resourceDocs.map((doc) =>
+    mapResourceToResponse(
+      doc as unknown as IResource & {
+        uploaderId: { _id: Types.ObjectId; name: string; avatarUrl?: string };
+      },
+      {
+        isSaved: savedSet.has(doc._id.toString()),
+        savesCount: savesCountMap.get(doc._id.toString()) ?? 0,
+      },
+    ),
+  );
+
+  // 3. Fetch discussions created by user
+  const [discussionDocs, createdDiscussionsCount, totalCommentsCount] =
+    await Promise.all([
+      Discussion.find({
+        authorId: userObjectId,
+        status: { $in: ["published", "pinned"] },
+      })
+        .populate("authorId", "name avatarUrl")
+        .populate("courseId", "title code")
+        .populate("resourceId", "title type")
+        .sort({ createdAt: -1 }),
+      Discussion.countDocuments({
+        authorId: userObjectId,
+        status: { $in: ["published", "pinned"] },
+      }),
+      Comment.countDocuments({
+        authorId: userObjectId,
+        status: "published",
+      }),
+    ]);
+
+  const createdDiscussions = discussionDocs.map((doc) =>
+    mapDiscussionToResponse(
+      doc as unknown as IDiscussion & {
+        authorId: { _id: Types.ObjectId; name: string; avatarUrl?: string };
+        courseId?: { _id: Types.ObjectId; title: string; code?: string };
+        resourceId?: { _id: Types.ObjectId; title: string; type: string };
+      },
+    ),
+  );
+
+  return {
+    summary: {
+      uploadedResourcesCount: resourceDocs.length,
+      createdDiscussionsCount,
+      totalCommentsCount,
+      totalSavesReceived,
+    },
+    uploadedResources,
+    createdDiscussions,
+  };
 }

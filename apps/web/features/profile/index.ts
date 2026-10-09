@@ -11,5 +11,6 @@ export * from "./mutations";
 export { ProfileView } from "./components/profile-view";
 export { ProfileHeader } from "./components/profile-header";
 export { ProfileDetailsCard } from "./components/profile-details-card";
+export { ProfileContributionSummaryCard } from "./components/profile-contribution-summary-card";
 export { ProfileEditForm } from "./components/profile-edit-form";
 export { ProfileEmptyState } from "./components/profile-empty-state";

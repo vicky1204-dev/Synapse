@@ -29,6 +29,7 @@ export function useCreateDiscussion() {
     mutationFn: (data: CreateDiscussionRequest) => createDiscussion(data),
     onSuccess: (discussion) => {
       void queryClient.invalidateQueries({ queryKey: discussionKeys.all });
+      void queryClient.invalidateQueries({ queryKey: ["contributions"] });
       toast.add({
         title: "Discussion started",
         description: `"${discussion.title}" has been published.`,
@@ -81,6 +82,7 @@ export function useDeleteDiscussion() {
     mutationFn: (id: string) => deleteDiscussion(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: discussionKeys.all });
+      void queryClient.invalidateQueries({ queryKey: ["contributions"] });
       toast.add({
         title: "Discussion deleted",
         description: "The discussion has been removed.",
@@ -110,6 +112,7 @@ export function useCreateComment(discussionId: string) {
       void queryClient.invalidateQueries({
         queryKey: discussionKeys.detail(discussionId),
       });
+      void queryClient.invalidateQueries({ queryKey: ["contributions"] });
       toast.add({
         title: "Reply posted",
         description: "Your reply has been added to the discussion.",

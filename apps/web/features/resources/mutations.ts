@@ -23,6 +23,7 @@ export function useUploadResource() {
     mutationFn: (formData: FormData) => uploadResourceFile(formData),
     onSuccess: (resource) => {
       void queryClient.invalidateQueries({ queryKey: resourceKeys.all });
+      void queryClient.invalidateQueries({ queryKey: ["contributions"] });
       toast.add({
         title: "Resource uploaded",
         description: `"${resource.title}" is ready in your library.`,
@@ -46,6 +47,7 @@ export function useCreateResource() {
     mutationFn: (data: CreateResourceRequest) => createResource(data),
     onSuccess: (resource) => {
       void queryClient.invalidateQueries({ queryKey: resourceKeys.all });
+      void queryClient.invalidateQueries({ queryKey: ["contributions"] });
       toast.add({
         title: "Resource created",
         description: `"${resource.title}" has been added to the library.`,
@@ -115,6 +117,7 @@ export function useDeleteResource() {
     mutationFn: (id: string) => deleteResource(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: resourceKeys.all });
+      void queryClient.invalidateQueries({ queryKey: ["contributions"] });
       toast.add({
         title: "Resource deleted",
         description: "The resource has been deleted.",

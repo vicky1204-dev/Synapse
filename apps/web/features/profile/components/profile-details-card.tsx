@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import type { User } from "@/features/auth/types";
 import { useSubjects } from "@/features/onboarding/queries";
 import { ProfileEmptyState } from "./profile-empty-state";
+import { ProfileContributionSummaryCard } from "./profile-contribution-summary-card";
 import {
   BookOpenIcon,
   Building2Icon,
@@ -138,6 +139,9 @@ export function ProfileDetailsCard({ user, onEdit }: ProfileDetailsCardProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Contributions Summary Card (Full width on md) */}
+      <ProfileContributionSummaryCard />
 
       {/* Enrolled Subjects Card (Full width on md) */}
       <Card className="rounded-3xl border border-border/80 shadow-xs md:col-span-2">
