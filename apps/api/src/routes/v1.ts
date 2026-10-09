@@ -25,6 +25,7 @@ import {
 } from "../modules/discussions/discussion.routes";
 
 import { studyRouter } from "../modules/study/study.routes";
+import { homeRouter } from "../modules/home/home.routes";
 
 const v1Router = Router();
 
@@ -38,5 +39,6 @@ v1Router.use("/courses", courseRouter);
 v1Router.use("/discussions", discussionRouter);
 v1Router.use("/comments", commentRouter);
 v1Router.use("/study", studyRouter);
+v1Router.use("/home", homeRouter);
 
 export { v1Router };

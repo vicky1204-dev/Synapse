@@ -34,21 +34,37 @@ import type {
 // ---------------------------------------------------------------------------
 
 export function mapProgressToResponse(
-  doc: IActivityProgress,
+  doc: IActivityProgress & {
+    userId?: Types.ObjectId | { _id?: Types.ObjectId } | null;
+    activityId?: Types.ObjectId | { _id?: Types.ObjectId } | null;
+    courseId?: Types.ObjectId | { _id?: Types.ObjectId } | null;
+    resourceId?: Types.ObjectId | { _id?: Types.ObjectId } | null;
+  },
 ): ActivityProgressResponse {
+  const toIdString = (val: unknown): string => {
+    if (!val) return "";
+    if (typeof val === "object" && "_id" in (val as Record<string, unknown>)) {
+      const id = (val as { _id?: unknown })._id;
+      return id ? String(id) : "";
+    }
+    return String(val);
+  };
+
   return {
-    id: doc._id.toString(),
-    userId: doc.userId.toString(),
-    activityId: doc.activityId.toString(),
-    courseId: doc.courseId.toString(),
-    resourceId: doc.resourceId ? doc.resourceId.toString() : undefined,
+    id: doc._id ? doc._id.toString() : "",
+    userId: toIdString(doc.userId),
+    activityId: toIdString(doc.activityId),
+    courseId: toIdString(doc.courseId),
+    resourceId: doc.resourceId ? toIdString(doc.resourceId) : undefined,
     status: doc.status,
     durationSeconds: doc.durationSeconds || 0,
     lastPosition: doc.lastPosition,
     notes: doc.notes,
     startedAt: doc.startedAt ? doc.startedAt.toISOString() : undefined,
     completedAt: doc.completedAt ? doc.completedAt.toISOString() : undefined,
-    lastStudiedAt: doc.lastStudiedAt.toISOString(),
+    lastStudiedAt: doc.lastStudiedAt
+      ? doc.lastStudiedAt.toISOString()
+      : new Date().toISOString(),
   };
 }
 
@@ -740,16 +756,16 @@ export async function getRecentStudy(
       activity: mapActivityToResponse(activity, prog),
       progress: mapProgressToResponse(prog),
       course: {
-        id: course._id ? course._id.toString() : "",
-        title: course.title || "Course",
-        code: course.code,
-        cover: course.cover,
+        id: course?._id ? course._id.toString() : (course && typeof course === "string" ? course : ""),
+        title: course?.title || "Course",
+        code: course?.code,
+        cover: course?.cover,
       },
       resource: resource
         ? {
-            id: resource._id ? resource._id.toString() : "",
-            title: resource.title,
-            type: resource.type,
+            id: resource?._id ? resource._id.toString() : (typeof resource === "string" ? resource : ""),
+            title: resource?.title || "Resource",
+            type: resource?.type || "pdf",
           }
         : undefined,
     });
