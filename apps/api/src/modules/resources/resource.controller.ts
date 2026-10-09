@@ -245,11 +245,19 @@ export async function getSavedResources(
   try {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 20;
+    const search =
+      typeof req.query.search === "string" ? req.query.search.trim() : undefined;
+    const type =
+      typeof req.query.type === "string" ? req.query.type.trim() : undefined;
 
     const { data, pagination } = await resourceService.getSavedResources(
       req.user!.userId,
-      page,
-      limit,
+      {
+        page,
+        limit,
+        search,
+        type,
+      },
     );
 
     sendPaginated(res, data, pagination);

@@ -11,6 +11,7 @@ import * as resourceController from "./resource.controller";
 
 const router = Router();
 
+router.get("/", authenticate, resourceController.getSavedResources);
 router.get("/resources", authenticate, resourceController.getSavedResources);
 
 export { router as savedRouter };
