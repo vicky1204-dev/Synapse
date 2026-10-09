@@ -49,6 +49,8 @@ import { useCourses, useUpdateCourse } from "@/features/courses";
 import { cn } from "@/lib/utils";
 
 interface UploadDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   courseId?: string;
   triggerButton?: React.ReactNode;
   onSuccess?: () => void;
@@ -78,11 +80,15 @@ const SHIMMER_MESSAGES = [
 ];
 
 export function UploadDialog({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
   courseId,
   triggerButton,
   onSuccess,
 }: UploadDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -122,7 +128,11 @@ export function UploadDialog({
 
   // Reset modal state on close or set initial course on open
   const handleOpenChange = (isOpen: boolean) => {
-    setOpen(isOpen);
+    if (isControlled) {
+      controlledOnOpenChange?.(isOpen);
+    } else {
+      setInternalOpen(isOpen);
+    }
     if (isOpen) {
       if (courseId) {
         form.setValue("courseId", courseId);
@@ -317,21 +327,23 @@ export function UploadDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger
-        render={
-          triggerButton ? (
-            (triggerButton as React.ReactElement)
-          ) : (
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-neutral-800 dark:bg-foreground dark:text-background"
-            >
-              <PlusIcon className="size-4" />
-              <span>New resource</span>
-            </button>
-          )
-        }
-      />
+      {(triggerButton || !isControlled) && (
+        <DialogTrigger
+          render={
+            triggerButton ? (
+              (triggerButton as React.ReactElement)
+            ) : (
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-neutral-800 dark:bg-foreground dark:text-background"
+              >
+                <PlusIcon className="size-4" />
+                <span>New resource</span>
+              </button>
+            )
+          }
+        />
+      )}
 
       <DialogContent className="w-full sm:max-w-4xl overflow-hidden rounded-3xl p-0 shadow-2xl border-border/60">
         {/* Header */}
