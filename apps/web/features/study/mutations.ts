@@ -34,6 +34,9 @@ export function useStartOrGetSession() {
       void queryClient.invalidateQueries({
         queryKey: studyKeys.recent(),
       });
+      void queryClient.invalidateQueries({
+        queryKey: ["home"],
+      });
     },
     onError: (err: Error) => {
       toast.add({
@@ -90,6 +93,9 @@ export function useHeartbeatActivity(activityId: string, courseId?: string) {
       void queryClient.invalidateQueries({
         queryKey: studyKeys.recent(),
       });
+      void queryClient.invalidateQueries({
+        queryKey: ["home"],
+      });
     },
   });
 }
@@ -117,6 +123,9 @@ export function useCompleteActivity(activityId: string, courseId?: string) {
       }
       void queryClient.invalidateQueries({
         queryKey: studyKeys.recent(),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["home"],
       });
       toast.add({
         title: "Activity completed!",

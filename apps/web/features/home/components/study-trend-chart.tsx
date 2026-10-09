@@ -88,7 +88,9 @@ export function StudyTrendChart({ stats, className }: StudyTrendChartProps) {
       {/* Bottom Action Footer */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-border/40">
         <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-          Let&apos;s try more today.
+          {(stats?.totalStudyTimeMinutes || 0) > 0
+            ? "Let's try more today."
+            : "No study sessions logged this week. Start a focus timer to build your streak."}
         </p>
         <Link
           href="/study"

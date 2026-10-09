@@ -27,11 +27,12 @@ import {
   RefreshCwIcon,
   FolderIcon,
   UploadIcon,
+  SparklesIcon,
 } from "lucide-react";
 
 export function HomeView() {
   const queryClient = useQueryClient();
-  const { data, isLoading, isError, refetch } = useHomeDashboard();
+  const { data, isLoading, isError, isFetching, refetch } = useHomeDashboard();
 
   const [createCourseOpen, setCreateCourseOpen] = React.useState(false);
   const [uploadResourceOpen, setUploadResourceOpen] = React.useState(false);
@@ -52,44 +53,138 @@ export function HomeView() {
     }).format(new Date());
   }, []);
 
+  // ── 1. LOADING STATE ──
   if (isLoading) {
     return (
-      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-8 animate-pulse">
+      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-10 animate-pulse">
         {/* Header skeleton */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <Skeleton className="h-10 w-64 rounded-xl" />
-            <Skeleton className="h-4 w-96 rounded-md" />
+            <Skeleton className="h-9 sm:h-10 w-64 rounded-2xl" />
+            <Skeleton className="h-4 w-80 sm:w-96 rounded-md" />
           </div>
           <Skeleton className="h-9 w-24 rounded-full" />
         </div>
 
         {/* Hero grid skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <div className="lg:col-span-8 space-y-6">
-            <Skeleton className="h-56 w-full rounded-3xl" />
-            <Skeleton className="h-72 w-full rounded-3xl" />
+            {/* Continue Studying Card skeleton */}
+            <div className="rounded-3xl border border-border/60 bg-card/40 p-6 sm:p-7 space-y-5">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-28 rounded-full" />
+                  <Skeleton className="h-7 w-52 rounded-xl" />
+                  <Skeleton className="h-4 w-36 rounded-md" />
+                </div>
+                <Skeleton className="h-6 w-32 rounded-full" />
+              </div>
+              <div className="space-y-2 pt-1">
+                <Skeleton className="h-2 w-full rounded-full" />
+                <div className="flex justify-between">
+                  <Skeleton className="h-3 w-36 rounded-md" />
+                  <Skeleton className="h-3 w-28 rounded-md" />
+                </div>
+              </div>
+              <div className="flex justify-end pt-1">
+                <Skeleton className="h-10 w-28 rounded-full" />
+              </div>
+            </div>
+
+            {/* Today's plan Card skeleton */}
+            <div className="rounded-3xl border border-border/60 bg-card/40 p-6 sm:p-7 space-y-5">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1.5">
+                  <Skeleton className="h-3 w-20 rounded-full" />
+                  <Skeleton className="h-6 w-56 rounded-xl" />
+                </div>
+                <Skeleton className="h-7 w-24 rounded-full" />
+              </div>
+              <div className="space-y-3 pt-1">
+                {[1, 2, 3].map((n) => (
+                  <div key={n} className="flex items-center justify-between p-3.5">
+                    <div className="flex items-center gap-3.5">
+                      <Skeleton className="size-8 rounded-full" />
+                      <div className="space-y-1">
+                        <Skeleton className="h-4 w-40 rounded-md" />
+                        <Skeleton className="h-3 w-56 rounded-md" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-4 w-12 rounded-md" />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
+
+          {/* Right column skeleton */}
           <div className="lg:col-span-4 space-y-6">
-            <Skeleton className="h-40 w-full rounded-3xl" />
-            <Skeleton className="h-48 w-full rounded-3xl" />
+            <div className="rounded-3xl border border-border/60 bg-card/40 p-6 space-y-4">
+              <div className="flex justify-between">
+                <Skeleton className="h-3 w-16 rounded-full" />
+                <Skeleton className="h-4 w-14 rounded-full" />
+              </div>
+              <div className="flex gap-3.5 pt-1">
+                <Skeleton className="size-10 rounded-2xl" />
+                <div className="space-y-1 flex-1">
+                  <Skeleton className="h-4 w-28 rounded-md" />
+                  <Skeleton className="h-3 w-full rounded-md" />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-border/60 bg-card/40 p-6 space-y-4">
+              <div className="flex justify-between">
+                <Skeleton className="h-3 w-14 rounded-full" />
+                <Skeleton className="h-4 w-10 rounded-full" />
+              </div>
+              <div className="space-y-4 pt-1">
+                {[1, 2].map((n) => (
+                  <div key={n} className="flex gap-3.5">
+                    <Skeleton className="size-10 rounded-2xl" />
+                    <div className="space-y-1 flex-1">
+                      <Skeleton className="h-4 w-24 rounded-md" />
+                      <Skeleton className="h-3 w-40 rounded-md" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Stats skeleton */}
-        <div className="space-y-4">
-          <Skeleton className="h-6 w-32 rounded-md" />
+        <div className="space-y-4 pt-2">
+          <Skeleton className="h-5 w-24 rounded-md" />
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Skeleton className="h-28 w-full rounded-3xl" />
-            <Skeleton className="h-28 w-full rounded-3xl" />
-            <Skeleton className="h-28 w-full rounded-3xl" />
+            <Skeleton className="h-28 rounded-3xl" />
+            <Skeleton className="h-28 rounded-3xl" />
+            <Skeleton className="h-28 rounded-3xl" />
           </div>
-          <Skeleton className="h-72 w-full rounded-3xl" />
+          <div className="rounded-3xl border border-border/60 bg-card/40 p-6 sm:p-7 space-y-6">
+            <div className="flex justify-between">
+              <Skeleton className="h-4 w-32 rounded-md" />
+              <Skeleton className="h-5 w-14 rounded-full" />
+            </div>
+            <div className="flex items-end justify-between gap-3 h-44 pt-2">
+              {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                <div key={n} className="flex-1 flex flex-col items-center gap-2.5 h-full justify-end">
+                  <Skeleton className="w-full max-w-[56px] h-36 rounded-2xl" />
+                  <Skeleton className="h-3 w-6 rounded-md" />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between pt-4 border-t border-border/40">
+              <Skeleton className="h-4 w-36 rounded-md" />
+              <Skeleton className="h-8 w-32 rounded-full" />
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
+  // ── 2. ERROR STATE ──
   if (isError || !data) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center px-4 text-center">
@@ -99,17 +194,27 @@ export function HomeView() {
         <h2 className="font-heading text-xl font-bold text-foreground">
           Unable to load dashboard
         </h2>
-        <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-          We encountered an issue retrieving your study workspace data. Please check your network and try again.
+        <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed max-w-sm">
+          We encountered an issue retrieving your study workspace data. Please check your connection and try again.
         </p>
-        <Button
-          variant="outline"
-          className="mt-6 rounded-full gap-2 border-border/80 hover:bg-card"
-          onClick={() => void refetch()}
-        >
-          <RefreshCwIcon className="size-4" />
-          <span>Retry</span>
-        </Button>
+        <div className="flex items-center gap-3 mt-6">
+          <Button
+            variant="outline"
+            className="rounded-full gap-2 border-border/80 hover:bg-card"
+            onClick={() => void refetch()}
+            disabled={isFetching}
+          >
+            <RefreshCwIcon className={`size-4 ${isFetching ? "animate-spin" : ""}`} />
+            <span>{isFetching ? "Retrying..." : "Retry"}</span>
+          </Button>
+
+          <Link
+            href="/study"
+            className="rounded-full bg-foreground text-background hover:bg-foreground/90 font-medium px-4 py-2 text-sm inline-flex items-center gap-1.5 transition-colors"
+          >
+            <span>Go to Study</span>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -117,25 +222,23 @@ export function HomeView() {
   const { user, continueStudying, courses, studyStats, courseCoverage, tasks } = data;
   const firstName = user.name ? user.name.split(" ")[0] : "Student";
 
-  // Primary course and metrics for continue studying card
-  const primaryCourse = continueStudying?.course || courses[0] || null;
-  const primaryCourseName = primaryCourse?.title || "Welcome to Synapse";
-  const primarySubtitle =
-    continueStudying?.activity?.title ||
-    continueStudying?.resource?.title ||
-    (courses.length > 0 ? "Select a course to start your study plan" : "Create your first course to get started");
+  // Check state categories
+  const hasCourses = courses && courses.length > 0;
+  const hasContinueStudying = Boolean(continueStudying);
+  const primaryCourse = continueStudying?.course || (hasCourses ? courses[0] : null);
 
   // Real course coverage from backend
   const coveragePercent = courseCoverage?.coveragePercentage ?? 0;
   const studiedResourcesCount = courseCoverage?.studiedResources ?? 0;
-  const totalCourseResources = courseCoverage?.totalResources ?? (courses[0] as { resourcesCount?: number })?.resourcesCount ?? 0;
+  const totalCourseResources =
+    courseCoverage?.totalResources ?? (hasCourses ? (courses[0] as { resourcesCount?: number })?.resourcesCount ?? 0 : 0);
   const completedActivities = courseCoverage?.completedActivities ?? studyStats.completedActivitiesCount ?? 0;
   const totalActivities = courseCoverage?.totalActivities ?? 0;
 
   // Real upcoming/active course
-  const upcomingCourse = courses[0] || null;
+  const upcomingCourse = hasCourses ? courses[0] : null;
 
-  // Real study hours/minutes formatting
+  // Real study hours/minutes formatting helper
   const formatTime = (minutes: number) => {
     if (!minutes || minutes <= 0) return "0 hrs";
     if (minutes < 60) return `${minutes} mins`;
@@ -155,7 +258,11 @@ export function HomeView() {
             {greeting}, {firstName}.
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-            You have a focused plan ready for today. Continue where you left off, then move into your scheduled review and practice.
+            {hasContinueStudying
+              ? "You have a focused plan ready for today. Continue where you left off, then move into your scheduled review and practice."
+              : hasCourses
+                ? "Your courses are ready. Start an active focus session or explore study resources to make progress."
+                : "Welcome to Synapse! Set up your first course to organize notes, syllabus topics, and start focused study sessions."}
           </p>
         </div>
 
@@ -193,67 +300,132 @@ export function HomeView() {
         {/* Left Column (8 cols): Continue Studying + Today's Plan */}
         <div className="lg:col-span-8 space-y-6">
           {/* Continue Studying Hero Card */}
-          <div className="rounded-3xl border border-border/70 bg-card/60 p-6 sm:p-7 backdrop-blur-xs shadow-xs space-y-5">
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Continue studying
-                </span>
-                <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground">
-                  {primaryCourseName}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  {primarySubtitle}
-                </p>
-              </div>
+          {hasContinueStudying && continueStudying ? (
+            <div className="rounded-3xl border border-border/70 bg-card/60 p-6 sm:p-7 backdrop-blur-xs shadow-xs space-y-5">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Continue studying
+                  </span>
+                  <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground">
+                    {continueStudying.course.title}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    {continueStudying.activity.title || continueStudying.resource?.title || "Active session"}
+                  </p>
+                </div>
 
-              {primaryCourse && (
                 <span className="rounded-full border border-border/70 bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground shrink-0">
                   {coveragePercent}% course coverage
                 </span>
-              )}
-            </div>
-
-            {/* Progress Bar & Metrics */}
-            <div className="space-y-2 pt-1">
-              <div className="h-2 w-full rounded-full bg-primary/20 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-500"
-                  style={{ width: `${Math.max(coveragePercent > 0 ? 8 : 0, coveragePercent)}%` }}
-                />
               </div>
 
-              <div className="flex items-center justify-between text-xs font-medium text-muted-foreground pt-1">
-                <span>
-                  {totalCourseResources > 0
-                    ? `${studiedResourcesCount} of ${totalCourseResources} resources studied`
-                    : `${studiedResourcesCount} resources studied`}
-                </span>
-                <span>
-                  {totalActivities > 0
-                    ? `${completedActivities} of ${totalActivities} topics reviewed`
-                    : `${completedActivities} topics reviewed`}
-                </span>
+              {/* Progress Bar & Real Metrics */}
+              <div className="space-y-2 pt-1">
+                <div className="h-2 w-full rounded-full bg-primary/20 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-500"
+                    style={{ width: `${Math.max(coveragePercent > 0 ? 8 : 0, coveragePercent)}%` }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-medium text-muted-foreground pt-1">
+                  <span>
+                    {totalCourseResources > 0
+                      ? `${studiedResourcesCount} of ${totalCourseResources} resources studied`
+                      : `${studiedResourcesCount} resources studied`}
+                  </span>
+                  <span>
+                    {totalActivities > 0
+                      ? `${completedActivities} of ${totalActivities} topics reviewed`
+                      : `${completedActivities} topics reviewed`}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Row */}
+              <div className="flex justify-end pt-1">
+                <Link
+                  href={`/study/${continueStudying.activity.id}`}
+                  className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-2.5 text-sm inline-flex items-center gap-1.5 shadow-xs transition-colors"
+                >
+                  <span>Continue</span>
+                  <ArrowRightIcon className="size-4" />
+                </Link>
               </div>
             </div>
+          ) : hasCourses && primaryCourse ? (
+            /* Student has courses, but no active study session yet */
+            <div className="rounded-3xl border border-border/70 bg-card/60 p-6 sm:p-7 backdrop-blur-xs shadow-xs space-y-5">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Start studying
+                  </span>
+                  <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground">
+                    {primaryCourse.title}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Ready to begin. Pick an activity or start a focused Pomodoro session.
+                  </p>
+                </div>
 
-            {/* Action Row */}
-            <div className="flex justify-end pt-1">
-              <Link
-                href={
-                  continueStudying
-                    ? `/study/${continueStudying.activity.id}`
-                    : courses[0]
-                      ? `/courses/${courses[0].id}`
-                      : "/study"
-                }
-                className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-2.5 text-sm inline-flex items-center gap-1.5 shadow-xs transition-colors"
-              >
-                <span>Continue</span>
-                <ArrowRightIcon className="size-4" />
-              </Link>
+                <span className="rounded-full border border-border/70 bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground shrink-0">
+                  {totalCourseResources} resources ready
+                </span>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <div className="h-2 w-full rounded-full bg-primary/20 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-500"
+                    style={{ width: `${Math.max(coveragePercent > 0 ? 8 : 0, coveragePercent)}%` }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-medium text-muted-foreground pt-1">
+                  <span>{studiedResourcesCount} of {totalCourseResources} resources studied</span>
+                  <span>{completedActivities} topics reviewed</span>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-1">
+                <Link
+                  href={`/courses/${primaryCourse.id}?tab=study`}
+                  className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-2.5 text-sm inline-flex items-center gap-1.5 shadow-xs transition-colors"
+                >
+                  <span>Start Session</span>
+                  <ArrowRightIcon className="size-4" />
+                </Link>
+              </div>
             </div>
-          </div>
+          ) : (
+            /* Zero courses empty state */
+            <div className="rounded-3xl border border-dashed border-border/80 bg-card/40 p-6 sm:p-8 backdrop-blur-xs shadow-xs space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1.5">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+                    <SparklesIcon className="size-3.5" />
+                    <span>Get Started</span>
+                  </span>
+                  <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground">
+                    Set up your study workspace
+                  </h2>
+                  <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
+                    Create your first course to organize lecture slides, syllabus topics, and start focused study timers.
+                  </p>
+                </div>
+
+                <Button
+                  onClick={() => setCreateCourseOpen(true)}
+                  className="rounded-full gap-2 self-start sm:self-center shadow-xs"
+                >
+                  <PlusIcon className="size-4" />
+                  <span>Create First Course</span>
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Today's Plan: Next Three Tasks */}
           <div className="rounded-3xl border border-border/70 bg-card/60 p-6 sm:p-7 backdrop-blur-xs shadow-xs space-y-5">
@@ -305,10 +477,74 @@ export function HomeView() {
                   </Link>
                 ))
               ) : (
-                <div className="rounded-2xl border border-dashed border-border/70 bg-card/30 p-6 text-center space-y-2">
-                  <p className="text-xs text-muted-foreground">
-                    No pending study tasks. Create a course or browse the library to begin.
-                  </p>
+                /* Starter Onboarding Tasks for New Students */
+                <div className="space-y-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setCreateCourseOpen(true)}
+                    className="w-full group flex items-center justify-between gap-4 p-3.5 rounded-2xl hover:bg-muted/40 transition-colors border border-transparent hover:border-border/50 text-left cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                        1
+                      </div>
+                      <div className="min-w-0 space-y-0.5">
+                        <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                          Create your first course
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Add your semester subjects and organize lecture materials.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-primary shrink-0">
+                      Action
+                    </span>
+                  </button>
+
+                  <Link
+                    href="/library"
+                    className="group flex items-center justify-between gap-4 p-3.5 rounded-2xl hover:bg-muted/40 transition-colors border border-transparent hover:border-border/50"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                        2
+                      </div>
+                      <div className="min-w-0 space-y-0.5">
+                        <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                          Browse Resource Library
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Discover study packs, past exam papers, and shared notes.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground shrink-0">
+                      5 min
+                    </span>
+                  </Link>
+
+                  <Link
+                    href="/study"
+                    className="group flex items-center justify-between gap-4 p-3.5 rounded-2xl hover:bg-muted/40 transition-colors border border-transparent hover:border-border/50"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                        3
+                      </div>
+                      <div className="min-w-0 space-y-0.5">
+                        <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                          Try a 25-minute Focus Session
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Run a distraction-free Pomodoro session to establish your study streak.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground shrink-0">
+                      25 min
+                    </span>
+                  </Link>
                 </div>
               )}
             </div>
@@ -346,18 +582,29 @@ export function HomeView() {
                 </div>
               </Link>
             ) : (
-              <div className="flex items-start gap-3.5 pt-1">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-                  <FolderIcon className="size-5" />
+              <div className="space-y-3 pt-1">
+                <div className="flex items-start gap-3.5">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-muted/60 text-muted-foreground">
+                    <FolderIcon className="size-5" />
+                  </div>
+                  <div className="space-y-1 min-w-0">
+                    <h4 className="text-sm font-semibold text-foreground">
+                      No active courses
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Add your subjects to view semester schedules and targets.
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <h4 className="text-sm font-semibold text-foreground">
-                    No active courses
-                  </h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Create a course to set up your semester curriculum.
-                  </p>
-                </div>
+                <Button
+                  onClick={() => setCreateCourseOpen(true)}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full text-xs gap-1.5 w-full border-border/80"
+                >
+                  <PlusIcon className="size-3.5" />
+                  <span>Create Course</span>
+                </Button>
               </div>
             )}
           </div>
