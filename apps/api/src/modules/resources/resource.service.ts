@@ -462,26 +462,76 @@ export async function unsaveResource(
 
 export async function getSavedResources(
   userId: string,
-  page = 1,
-  limit = 20,
+  optionsOrPage:
+    | {
+        page?: number;
+        limit?: number;
+        search?: string;
+        type?: string;
+      }
+    | number = 1,
+  limitArg = 20,
 ): Promise<{ data: ResourceResponse[]; pagination: Pagination }> {
+  let page = 1;
+  let limit = 20;
+  let search: string | undefined;
+  let type: string | undefined;
+
+  if (typeof optionsOrPage === "number") {
+    page = optionsOrPage;
+    limit = limitArg;
+  } else {
+    page = optionsOrPage.page || 1;
+    limit = optionsOrPage.limit || 20;
+    search = optionsOrPage.search;
+    type = optionsOrPage.type;
+  }
+
   const skip = (page - 1) * limit;
   const userObjectId = new Types.ObjectId(userId);
 
-  const [total, savedEntries] = await Promise.all([
-    SavedResource.countDocuments({ userId: userObjectId }),
-    SavedResource.find({ userId: userObjectId })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .select("resourceId"),
-  ]);
+  // 1. Fetch saved resource IDs for this user
+  const savedEntries = await SavedResource.find({ userId: userObjectId })
+    .sort({ createdAt: -1 })
+    .select("resourceId");
 
   const resourceIds = savedEntries.map((entry) => entry.resourceId);
 
-  const resources = await Resource.find({
+  if (resourceIds.length === 0) {
+    return {
+      data: [],
+      pagination: {
+        page,
+        limit,
+        total: 0,
+        hasNextPage: false,
+      },
+    };
+  }
+
+  // 2. Build resource query
+  const query: Record<string, unknown> = {
     _id: { $in: resourceIds },
-  }).populate("uploaderId", "name avatarUrl");
+    status: "active",
+  };
+
+  if (type && type !== "all") {
+    query.type = type;
+  }
+
+  if (search) {
+    const searchRegex = new RegExp(search, "i");
+    query.$or = [
+      { title: searchRegex },
+      { description: searchRegex },
+      { tags: searchRegex },
+    ];
+  }
+
+  const [totalMatching, resources] = await Promise.all([
+    Resource.countDocuments(query),
+    Resource.find(query).populate("uploaderId", "name avatarUrl"),
+  ]);
 
   // Keep saved order
   const resourceMap = new Map(resources.map((r) => [r._id.toString(), r]));
@@ -489,10 +539,15 @@ export async function getSavedResources(
     .map((id) => resourceMap.get(id.toString()))
     .filter((r): r is NonNullable<typeof r> => Boolean(r));
 
-  const data = orderedResources.map((doc) =>
-    mapResourceToResponse(doc as unknown as IResource & { uploaderId: Types.ObjectId }, {
-      isSaved: true,
-    }),
+  const pagedResources = orderedResources.slice(skip, skip + limit);
+
+  const data = pagedResources.map((doc) =>
+    mapResourceToResponse(
+      doc as unknown as IResource & { uploaderId: Types.ObjectId },
+      {
+        isSaved: true,
+      },
+    ),
   );
 
   return {
@@ -500,8 +555,8 @@ export async function getSavedResources(
     pagination: {
       page,
       limit,
-      total,
-      hasNextPage: skip + savedEntries.length < total,
+      total: totalMatching,
+      hasNextPage: skip + pagedResources.length < totalMatching,
     },
   };
 }

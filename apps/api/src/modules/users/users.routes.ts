@@ -12,6 +12,7 @@ const router = Router();
 
 // Protected user profile & onboarding endpoints
 router.get("/me", authenticate, usersController.getMe);
+router.get("/me/contributions", authenticate, usersController.getContributions);
 router.patch("/me", authenticate, usersController.updateProfile);
 router.patch("/me/onboarding", authenticate, usersController.updateOnboarding);
 

@@ -1,9 +1,11 @@
-import React from 'react'
+import type { Metadata } from "next";
+import { SavedResourcesView } from "@/features/saved";
 
-const Saved = () => {
-  return (
-    <div>Saved</div>
-  )
+export const metadata: Metadata = {
+  title: "Saved Resources | Synapse",
+  description: "Access your bookmarked lecture slides, notes, and study materials.",
+};
+
+export default function SavedPage() {
+  return <SavedResourcesView />;
 }
-
-export default Saved

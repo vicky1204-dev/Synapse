@@ -81,3 +81,22 @@ export async function updateOnboarding(
     next(error);
   }
 }
+
+export async function getContributions(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    if (!req.user) {
+      throw new BadRequestError("User not authenticated", "NOT_AUTHENTICATED");
+    }
+
+    const contributions = await usersService.getUserContributions(
+      req.user.userId,
+    );
+    sendSuccess(res, contributions);
+  } catch (error) {
+    next(error);
+  }
+}

@@ -3,6 +3,8 @@
  */
 
 import type { OnboardingStatus } from "../auth/auth.types";
+import type { ResourceResponse } from "../resources/resource.types";
+import type { DiscussionResponse } from "../discussions/discussion.types";
 
 export interface AcademicProfileDto {
   program?: string;
@@ -26,4 +28,17 @@ export interface UpdateProfileDto {
   preferences?: {
     theme?: "light" | "dark" | "system";
   };
+}
+
+export interface UserContributionsSummary {
+  uploadedResourcesCount: number;
+  createdDiscussionsCount: number;
+  totalCommentsCount: number;
+  totalSavesReceived: number;
+}
+
+export interface UserContributionsResponse {
+  summary: UserContributionsSummary;
+  uploadedResources: ResourceResponse[];
+  createdDiscussions: DiscussionResponse[];
 }
